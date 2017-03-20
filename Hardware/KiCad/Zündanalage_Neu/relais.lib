@@ -1,0 +1,20 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#
+# Relais
+#
+DEF Relais U 0 40 Y Y 1 F N
+F0 "U" -200 100 60 H V C CNN
+F1 "Relais" -200 100 60 H V C CNN
+F2 "" -200 100 60 H I C CNN
+F3 "" -200 100 60 H I C CNN
+DRAW
+S -3800 2150 -2950 1350 0 1 0 N
+X Arbeit1 ~ -2750 2000 200 L 50 50 1 1 I
+X Arbeit2 ~ -2750 1650 200 L 50 50 1 1 O
+X Spule1 ~ -4000 2000 200 R 50 50 1 1 I
+X Spule2 ~ -4000 1650 200 R 50 50 1 1 O
+ENDDRAW
+ENDDEF
+#
+#End Library
