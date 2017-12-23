@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -88,12 +92,17 @@ public class MainActivity extends BaseActivity {
 		this.serverThread = new Thread(new ServerThread());
 		this.serverThread.start();
 
-		moduleQuerySchedule = scheduler.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				queryModules();
-			}
-		}, 0, 1000, TimeUnit.MILLISECONDS);
+		try {
+			final InetAddress broadcast = getBroadcast();
+			moduleQuerySchedule = scheduler.scheduleAtFixedRate(new Runnable() {
+				@Override
+				public void run() {
+					queryModules(broadcast);
+				}
+			}, 0, 1000, TimeUnit.MILLISECONDS);
+		} catch (SocketException e) {
+			showMessage("can not determine broadcast ip");
+		}
 		super.onStart();
 	}
 
@@ -258,7 +267,7 @@ public class MainActivity extends BaseActivity {
 		}
 	}
 
-	private void queryModules() {
+	private void queryModules(InetAddress broadcast) {
 		final String requestId = UUID.randomUUID().toString();
 		moduleRequestResults.put(requestId, new ArrayList<ModuleRequestResult>());
 
@@ -304,8 +313,21 @@ public class MainActivity extends BaseActivity {
 				return null;
 			}
 		}, 500, TimeUnit.MILLISECONDS);
+		final ModuleQueryTask moduleQueryTask = new ModuleQueryTask(broadcast);
+		moduleQueryTask.execute(requestId);
+	}
 
-		new ModuleQueryTask().execute(requestId);
+	private static InetAddress getBroadcast() throws SocketException {
+		System.setProperty("java.net.preferIPv4Stack", "true");
+		for (Enumeration<NetworkInterface> niEnum = NetworkInterface.getNetworkInterfaces(); niEnum.hasMoreElements();) {
+			NetworkInterface ni = niEnum.nextElement();
+			if (!ni.isLoopback() && ni.getDisplayName().contains("wlan0")) {
+				for (InterfaceAddress interfaceAddress : ni.getInterfaceAddresses()) {
+					return interfaceAddress.getBroadcast();
+				}
+			}
+		}
+		return null;
 	}
 
 	private void handleModuleListChanged() {

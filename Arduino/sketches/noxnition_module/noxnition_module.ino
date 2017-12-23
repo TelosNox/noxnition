@@ -89,7 +89,7 @@ void setup() {
   Serial.println();
 
   boolean clientMode = initWifiClient(ssid, password);
-
+  
   Serial.println(WiFi.localIP());
   
   if (!clientMode) {
@@ -401,7 +401,6 @@ void handleFire() {
 void loop() {
   int packetSize = Udp.parsePacket();
 if (packetSize) {
-  Serial.printf("Received %d bytes from %s, port %d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
   int len = Udp.read(incomingPacket, 255);
   if (len > 0) {
     incomingPacket[len] = 0;
@@ -418,7 +417,6 @@ if (packetSize) {
     client.print(temp);
   }
   client.stop();
-  Serial.printf("UDP packet contents: %s\n", incomingPacket);
 }
   processVoltage();
   handleFire();
