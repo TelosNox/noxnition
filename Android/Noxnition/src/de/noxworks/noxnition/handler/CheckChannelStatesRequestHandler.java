@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import android.os.Handler;
 import android.widget.ToggleButton;
-import de.noxworks.noxnition.FireFragment;
+import de.noxworks.noxnition.direct.execute.FireFragment;
 
 public class CheckChannelStatesRequestHandler extends RequestHandler<FireFragment> {
 

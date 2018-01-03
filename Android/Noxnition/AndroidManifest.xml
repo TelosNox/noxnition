@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name="de.noxworks.noxnition.main.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,9 +28,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FireActivity" />
+            android:name="de.noxworks.noxnition.direct.execute.FireActivity" />
         <activity
-            android:name=".PlanFireworkActivity" />
+            android:name="de.noxworks.noxnition.planned.PlanFireworkActivity" />
         <activity
             android:name="de.noxworks.noxnition.planned.execute.ExecutePlannedFireworkActivity" />
         </application>

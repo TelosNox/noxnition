@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.planned;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

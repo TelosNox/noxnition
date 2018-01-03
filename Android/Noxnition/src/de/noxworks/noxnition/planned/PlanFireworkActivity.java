@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.planned;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +22,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import de.noxworks.noxnition.BaseActivity;
+import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.R.id;
+import de.noxworks.noxnition.R.layout;
+import de.noxworks.noxnition.R.menu;
 import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireAction;

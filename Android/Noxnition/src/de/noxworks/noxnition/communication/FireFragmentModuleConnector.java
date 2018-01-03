@@ -1,7 +1,7 @@
 package de.noxworks.noxnition.communication;
 
 import android.os.Handler;
-import de.noxworks.noxnition.FireFragment;
+import de.noxworks.noxnition.direct.execute.FireFragment;
 import de.noxworks.noxnition.handler.ArmRequestHandler;
 import de.noxworks.noxnition.handler.CheckChannelStatesRequestHandler;
 import de.noxworks.noxnition.handler.FireChannelRequestHandler;

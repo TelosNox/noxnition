@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.direct.execute;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,6 +11,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.WindowManager;
 import android.widget.Toast;
+import de.noxworks.noxnition.IMessageable;
+import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.R.id;
+import de.noxworks.noxnition.R.layout;
 import de.noxworks.noxnition.model.IgnitionModule;
 
 public class FireActivity extends FragmentActivity implements IMessageable {

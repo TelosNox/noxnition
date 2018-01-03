@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.main;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,11 +28,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.R.id;
+import de.noxworks.noxnition.R.layout;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.PlannedFirework;
 import de.noxworks.noxnition.persistence.SettingsManager;
+import de.noxworks.noxnition.planned.PlanFireworkActivity;
 
-public class PlanFireworkFragment extends Fragment {
+public class PlannedFireworkSelectionFragment extends Fragment {
 
 	private static final int DELETE_PLANNED_FIREWORK = 1;
 	private static final int RENAME_PLANNED_FIREWORK = 2;
@@ -41,7 +45,7 @@ public class PlanFireworkFragment extends Fragment {
 	private ArrayAdapter<PlannedFirework> plannedFireworksAdapter;
 	private Handler updateConversationHandler;
 
-	public PlanFireworkFragment(SettingsManager settingsManager) {
+	public PlannedFireworkSelectionFragment(SettingsManager settingsManager) {
 		this.settingsManager = settingsManager;
 	}
 
@@ -128,7 +132,7 @@ public class PlanFireworkFragment extends Fragment {
 			handleFireworkListChanged();
 			return true;
 		case RENAME_PLANNED_FIREWORK:
-			FragmentActivity activity = PlanFireworkFragment.this.getActivity();
+			FragmentActivity activity = PlannedFireworkSelectionFragment.this.getActivity();
 			final Dialog nameDialog = new Dialog(activity);
 			nameDialog.setTitle("Name");
 			nameDialog.setContentView(R.layout.plan_firework_name_dialog);

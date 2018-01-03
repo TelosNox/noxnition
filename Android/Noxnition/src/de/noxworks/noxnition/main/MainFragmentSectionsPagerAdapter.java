@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.main;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,9 +17,9 @@ public class MainFragmentSectionsPagerAdapter extends FragmentStatePagerAdapter 
 	@Override
 	public Fragment getItem(int position) {
 		if (position == 0) {
-			return ModuleFragment.newInstance(settingsManager);
+			return ModuleSelectionFragment.newInstance(settingsManager);
 		}
-		return new PlanFireworkFragment(settingsManager);
+		return new PlannedFireworkSelectionFragment(settingsManager);
 	}
 
 	@Override

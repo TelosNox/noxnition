@@ -1,9 +1,13 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.main;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.widget.Toast;
+import de.noxworks.noxnition.BaseActivity;
+import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.R.id;
+import de.noxworks.noxnition.R.layout;
 import de.noxworks.noxnition.persistence.SettingsManager;
 
 public class MainActivity extends BaseActivity {

@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.direct.execute;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +24,12 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+import de.noxworks.noxnition.IFireResultHandler;
+import de.noxworks.noxnition.IMessageable;
+import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.R.id;
+import de.noxworks.noxnition.R.layout;
+import de.noxworks.noxnition.R.menu;
 import de.noxworks.noxnition.communication.FireChannelResult;
 import de.noxworks.noxnition.communication.FireFragmentModuleConnector;
 import de.noxworks.noxnition.communication.ModuleConnector;

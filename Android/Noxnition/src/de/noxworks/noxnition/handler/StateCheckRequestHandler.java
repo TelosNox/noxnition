@@ -3,8 +3,8 @@ package de.noxworks.noxnition.handler;
 import java.util.Properties;
 
 import android.os.Handler;
-import de.noxworks.noxnition.FireFragment;
 import de.noxworks.noxnition.communication.StateCheckResult;
+import de.noxworks.noxnition.direct.execute.FireFragment;
 
 public class StateCheckRequestHandler extends RequestHandler<FireFragment> {
 

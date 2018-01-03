@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,14 +39,18 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.R.id;
+import de.noxworks.noxnition.R.layout;
 import de.noxworks.noxnition.adapter.ModuleArrayAdapter;
+import de.noxworks.noxnition.direct.execute.FireActivity;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.model.ModuleRequestResult;
 import de.noxworks.noxnition.persistence.ModuleConfig;
 import de.noxworks.noxnition.persistence.SettingsManager;
 import de.noxworks.noxnition.tasks.ModuleQueryTask;
 
-public class ModuleFragment extends Fragment {
+public class ModuleSelectionFragment extends Fragment {
 
 	private static final int SERVERPORT = 2410;
 
@@ -65,12 +69,12 @@ public class ModuleFragment extends Fragment {
 
 	private final SettingsManager settingsManager;
 
-	public ModuleFragment(SettingsManager settingsManager) {
+	public ModuleSelectionFragment(SettingsManager settingsManager) {
 		this.settingsManager = settingsManager;
 	}
 
-	public static ModuleFragment newInstance(SettingsManager settingsManager) {
-		ModuleFragment fragment = new ModuleFragment(settingsManager);
+	public static ModuleSelectionFragment newInstance(SettingsManager settingsManager) {
+		ModuleSelectionFragment fragment = new ModuleSelectionFragment(settingsManager);
 		return fragment;
 	}
 
