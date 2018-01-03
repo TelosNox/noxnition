@@ -140,7 +140,7 @@
         android:progressBackgroundTint="@android:color/transparent" />
 
     <ListView
-        android:id="@+id/plannedFiringList"
+        android:id="@+id/plannedFireActionsList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" >

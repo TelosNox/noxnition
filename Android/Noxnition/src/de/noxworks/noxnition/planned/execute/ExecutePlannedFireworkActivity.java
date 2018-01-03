@@ -27,8 +27,8 @@ import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
 import de.noxworks.noxnition.communication.FireChannelResult;
 import de.noxworks.noxnition.communication.ModuleConnector;
 import de.noxworks.noxnition.handler.FireChannelRequestHandler;
-import de.noxworks.noxnition.model.FireAction;
 import de.noxworks.noxnition.model.IgnitionModule;
+import de.noxworks.noxnition.persistence.FireAction;
 
 public class ExecutePlannedFireworkActivity extends BaseActivity implements IFireResultHandler {
 
@@ -93,7 +93,7 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	private void initMainLayout() {
 		setContentView(R.layout.execute_planned_firework_layout);
 
-		ListView plannedFiringList = (ListView) findViewById(R.id.plannedFiringList);
+		ListView plannedFiringList = (ListView) findViewById(R.id.plannedFireActionsList);
 		fireActionArrayAdapter = new FireActionArrayAdapter(this, fireActions);
 		plannedFiringList.setAdapter(fireActionArrayAdapter);
 
@@ -177,9 +177,12 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 		if (timer != null) {
 			timer.cancel();
 		}
-		setCurrentActionBackgroundColors(Color.TRANSPARENT);
 		ModuleConnector moduleConnector = connectorsByIp.get(currentFireAction.getModule().getIpAddress());
 		moduleConnector.fireChannel(currentFireAction.getChannel());
+		setCurrentActionBackgroundColors(Color.TRANSPARENT);
+	}
+
+	private void channelFiredSuccess() {
 		handler.post(new Runnable() {
 
 			@Override
@@ -210,7 +213,20 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 	@Override
 	public void handleFireChannelResult(FireChannelResult result) {
-		// TODO Auto-generated method stub
+		if (result.isSuccess()) {
+			channelFiredSuccess();
+		} else {
+			channelFiredFail();
+		}
+	}
 
+	private void channelFiredFail() {
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				setCurrentActionBackgroundColors(Color.RED);
+			}
+		});
 	}
 }

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager;
 import android.widget.Toast;
-import de.noxworks.noxnition.settings.SettingsManager;
+import de.noxworks.noxnition.persistence.SettingsManager;
 
 public class BaseActivity extends FragmentActivity implements IMessageable {
 
@@ -22,7 +22,7 @@ public class BaseActivity extends FragmentActivity implements IMessageable {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		settingsManager.save(getSharedPreferences(PREFS_NAME, 0));
+		settingsManager.persist(getSharedPreferences(PREFS_NAME, 0));
 	}
 
 	@Override

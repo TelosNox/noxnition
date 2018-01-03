@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import de.noxworks.noxnition.R;
-import de.noxworks.noxnition.model.FireAction;
+import de.noxworks.noxnition.persistence.FireAction;
 
 public class FireActionArrayAdapter extends BaseAdapter {
 

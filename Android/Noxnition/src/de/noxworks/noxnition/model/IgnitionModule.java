@@ -2,7 +2,7 @@ package de.noxworks.noxnition.model;
 
 import java.io.Serializable;
 
-import de.noxworks.noxnition.settings.ModuleConfig;
+import de.noxworks.noxnition.persistence.ModuleConfig;
 
 public class IgnitionModule implements Serializable {
 

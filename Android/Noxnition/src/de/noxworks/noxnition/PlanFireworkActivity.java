@@ -23,11 +23,11 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
-import de.noxworks.noxnition.model.FireAction;
 import de.noxworks.noxnition.model.IgnitionModule;
-import de.noxworks.noxnition.model.PlannedFirework;
+import de.noxworks.noxnition.persistence.FireAction;
+import de.noxworks.noxnition.persistence.ModuleConfig;
+import de.noxworks.noxnition.persistence.PlannedFirework;
 import de.noxworks.noxnition.planned.execute.ExecutePlannedFireworkActivity;
-import de.noxworks.noxnition.settings.ModuleConfig;
 
 public class PlanFireworkActivity extends BaseActivity {
 
@@ -82,7 +82,7 @@ public class PlanFireworkActivity extends BaseActivity {
 		TextView name = (TextView) findViewById(R.id.planFirework_name);
 		name.setText(plannedFirework.getName());
 
-		ListView plannedFiringList = (ListView) findViewById(R.id.plannedFiringList);
+		ListView plannedFiringList = (ListView) findViewById(R.id.plannedFireActionsList);
 		fireActionArrayAdapter = new FireActionArrayAdapter(this, plannedFirework.getFireActions());
 		plannedFiringList.setAdapter(fireActionArrayAdapter);
 

@@ -7,14 +7,14 @@
     tools:context=".MainActivity" >
 
     <ListView
-        android:id="@+id/planFireworkDialog_list"
+        android:id="@+id/planFireworkSelection_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" >
     </ListView>
 
     <Button
-        android:id="@+id/planFireworkDialog_newButton"
+        android:id="@+id/planFireworkSelection_newButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"

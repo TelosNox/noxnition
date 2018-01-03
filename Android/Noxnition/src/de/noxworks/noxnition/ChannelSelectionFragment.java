@@ -9,8 +9,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import de.noxworks.noxnition.model.FireAction;
 import de.noxworks.noxnition.model.IgnitionModule;
+import de.noxworks.noxnition.persistence.FireAction;
 
 public class ChannelSelectionFragment extends Fragment {
 

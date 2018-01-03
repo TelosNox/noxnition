@@ -2,7 +2,6 @@ package de.noxworks.noxnition.adapter;
 
 import java.util.List;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +16,9 @@ public class ModuleArrayAdapter extends BaseAdapter {
 	private final List<IgnitionModule> ignitionModules;
 	private LayoutInflater inflater = null;
 
-	public ModuleArrayAdapter(Context context, List<IgnitionModule> ignitionModules) {
+	public ModuleArrayAdapter(LayoutInflater inflater, List<IgnitionModule> ignitionModules) {
 		this.ignitionModules = ignitionModules;
-		this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.inflater = inflater;
 	}
 
 	@Override
