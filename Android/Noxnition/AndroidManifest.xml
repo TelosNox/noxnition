@@ -33,6 +33,8 @@
             android:name="de.noxworks.noxnition.planned.PlanFireworkActivity" />
         <activity
             android:name="de.noxworks.noxnition.planned.execute.ExecutePlannedFireworkActivity" />
+        <activity
+            android:name="de.noxworks.noxnition.planned.ChannelSelectionActivity" />
         </application>
     
 </manifest>

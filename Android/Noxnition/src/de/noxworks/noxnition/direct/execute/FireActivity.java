@@ -13,8 +13,6 @@ import android.view.WindowManager;
 import android.widget.Toast;
 import de.noxworks.noxnition.IMessageable;
 import de.noxworks.noxnition.R;
-import de.noxworks.noxnition.R.id;
-import de.noxworks.noxnition.R.layout;
 import de.noxworks.noxnition.model.IgnitionModule;
 
 public class FireActivity extends FragmentActivity implements IMessageable {

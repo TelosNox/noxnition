@@ -10,6 +10,7 @@ import java.util.Set;
 import org.json.JSONException;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 import de.noxworks.noxnition.model.IgnitionModule;
 
 public class SettingsManager {
@@ -38,6 +39,7 @@ public class SettingsManager {
 				PlannedFirework plannedFirework = PlannedFirework.fromJson(string, ignitionModulesByName);
 				plannedFireworks.add(plannedFirework);
 			} catch (JSONException e) {
+				Log.e("", "", e);
 				e.printStackTrace();
 			}
 		}
@@ -98,6 +100,16 @@ public class SettingsManager {
 
 	public List<IgnitionModule> getIgnitionModules() {
 		return ignitionModules;
+	}
+
+	public List<IgnitionModule> getPlanableIgnitionModules() {
+		List<IgnitionModule> planableModules = new ArrayList<>();
+		for (IgnitionModule ignitionModule : getIgnitionModules()) {
+			if (ignitionModule.isPlannable()) {
+				planableModules.add(ignitionModule);
+			}
+		}
+		return planableModules;
 	}
 
 	public List<PlannedFirework> getPlannedFireworks() {

@@ -1,30 +1,37 @@
 package de.noxworks.noxnition.planned;
 
+import java.util.List;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import de.noxworks.noxnition.model.IgnitionModule;
+import de.noxworks.noxnition.persistence.FireTriggerGroup;
 
 public class ChannelSelectionFragmentSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
-	private PlanFireworkActivity activity;
+	private FireTriggerGroup fireTriggerGroup;
+	private List<IgnitionModule> ignitionModules;
 
-	public ChannelSelectionFragmentSectionsPagerAdapter(FragmentManager fm, PlanFireworkActivity activity) {
-		super(fm);
-		this.activity = activity;
+	public ChannelSelectionFragmentSectionsPagerAdapter(FragmentManager supportFragmentManager,
+	    FireTriggerGroup fireTriggerGroup, List<IgnitionModule> ignitionModules) {
+		super(supportFragmentManager);
+		this.fireTriggerGroup = fireTriggerGroup;
+		this.ignitionModules = ignitionModules;
 	}
 
 	@Override
 	public Fragment getItem(int position) {
-		return ChannelSelectionFragment.newInstance(activity, position);
+		return new ChannelSelectionFragment(ignitionModules.get(position), fireTriggerGroup);
 	}
 
 	@Override
 	public int getCount() {
-		return activity.getIgnitionModules().size();
+		return ignitionModules.size();
 	}
 
 	@Override
 	public CharSequence getPageTitle(int position) {
-		return activity.getIgnitionModules().get(position).getModuleConfig().getName();
+		return ignitionModules.get(position).getModuleConfig().getName();
 	}
 }

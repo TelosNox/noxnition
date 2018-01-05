@@ -37,4 +37,8 @@ public class IgnitionModule implements Serializable {
 	public long getLastUpdate() {
 		return lastUpdate;
 	}
+
+	public boolean isPlannable() {
+		return getModuleConfig().isConfigured();
+	}
 }

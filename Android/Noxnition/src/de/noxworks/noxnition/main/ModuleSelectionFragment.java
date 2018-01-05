@@ -40,8 +40,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import de.noxworks.noxnition.R;
-import de.noxworks.noxnition.R.id;
-import de.noxworks.noxnition.R.layout;
 import de.noxworks.noxnition.adapter.ModuleArrayAdapter;
 import de.noxworks.noxnition.direct.execute.FireActivity;
 import de.noxworks.noxnition.model.IgnitionModule;

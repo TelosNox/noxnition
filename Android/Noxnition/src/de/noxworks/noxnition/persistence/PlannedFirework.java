@@ -17,9 +17,11 @@ public class PlannedFirework implements Serializable {
 
 	private static final String NAME = "name";
 	private static final String ACTIONS = "actions";
+	private static final String TRIGGER_GROUPS = "trigger_groups";
 
 	private String name;
 	private final List<FireAction> fireActions = new ArrayList<>();
+	private final List<FireTriggerGroup> fireTriggerGroups = new ArrayList<>();
 
 	public PlannedFirework(String name) {
 		this.name = name;
@@ -37,6 +39,10 @@ public class PlannedFirework implements Serializable {
 		return fireActions;
 	}
 
+	public List<FireTriggerGroup> getFireTriggerGroups() {
+		return fireTriggerGroups;
+	}
+
 	@Override
 	public String toString() {
 		return getName();
@@ -50,6 +56,11 @@ public class PlannedFirework implements Serializable {
 			array.put(action.toJson());
 		}
 		json.put(ACTIONS, array);
+		JSONArray triggerGroupsJson = new JSONArray();
+		for (FireTriggerGroup fireTriggerGroup : fireTriggerGroups) {
+			triggerGroupsJson.put(fireTriggerGroup.toJson());
+		}
+		json.put(TRIGGER_GROUPS, triggerGroupsJson);
 		return json.toString();
 	}
 
@@ -64,6 +75,13 @@ public class PlannedFirework implements Serializable {
 			String actionJsonString = array.getString(i);
 			FireAction fireAction = FireAction.fromJson(actionJsonString, ignitionModules);
 			fireActions.add(fireAction);
+		}
+		List<FireTriggerGroup> fireTriggerGroups = plannedFirework.getFireTriggerGroups();
+		JSONArray triggerGroupArray = json.getJSONArray(TRIGGER_GROUPS);
+		for (int i = 0; i < triggerGroupArray.length(); i++) {
+			String triggerGroupJsonString = triggerGroupArray.getString(i);
+			FireTriggerGroup fireAction = FireTriggerGroup.fromJson(triggerGroupJsonString, ignitionModules);
+			fireTriggerGroups.add(fireAction);
 		}
 		return plannedFirework;
 	}

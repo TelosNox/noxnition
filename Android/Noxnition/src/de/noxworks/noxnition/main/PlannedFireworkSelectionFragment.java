@@ -1,6 +1,5 @@
 package de.noxworks.noxnition.main;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -29,9 +28,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import de.noxworks.noxnition.R;
-import de.noxworks.noxnition.R.id;
-import de.noxworks.noxnition.R.layout;
-import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.PlannedFirework;
 import de.noxworks.noxnition.persistence.SettingsManager;
 import de.noxworks.noxnition.planned.PlanFireworkActivity;
@@ -79,9 +75,9 @@ public class PlannedFireworkSelectionFragment extends Fragment {
 			public void onClick(View v) {
 				final Dialog nameDialog = new Dialog(context);
 				nameDialog.setTitle("Name");
-				nameDialog.setContentView(R.layout.plan_firework_name_dialog);
-				final EditText nameEdit = (EditText) nameDialog.findViewById(R.id.planFireworkDialog_name);
-				Button okButton = (Button) nameDialog.findViewById(R.id.planFireworkDialog_okButton);
+				nameDialog.setContentView(R.layout.name_change_dialog);
+				final EditText nameEdit = (EditText) nameDialog.findViewById(R.id.nameChangeDialog_name);
+				Button okButton = (Button) nameDialog.findViewById(R.id.nameChangeDialog_okButton);
 
 				okButton.setOnClickListener(new OnClickListener() {
 
@@ -135,10 +131,10 @@ public class PlannedFireworkSelectionFragment extends Fragment {
 			FragmentActivity activity = PlannedFireworkSelectionFragment.this.getActivity();
 			final Dialog nameDialog = new Dialog(activity);
 			nameDialog.setTitle("Name");
-			nameDialog.setContentView(R.layout.plan_firework_name_dialog);
-			final EditText nameEdit = (EditText) nameDialog.findViewById(R.id.planFireworkDialog_name);
+			nameDialog.setContentView(R.layout.name_change_dialog);
+			final EditText nameEdit = (EditText) nameDialog.findViewById(R.id.nameChangeDialog_name);
 			nameEdit.setText(plannedFirework.getName());
-			Button okButton = (Button) nameDialog.findViewById(R.id.planFireworkDialog_okButton);
+			Button okButton = (Button) nameDialog.findViewById(R.id.nameChangeDialog_okButton);
 
 			okButton.setOnClickListener(new OnClickListener() {
 
@@ -191,13 +187,6 @@ public class PlannedFireworkSelectionFragment extends Fragment {
 
 	private void startPlannedFireworkIntent(PlannedFirework plannedFirework, Context context) {
 		Intent nextScreen = new Intent(context, PlanFireworkActivity.class);
-		ArrayList<IgnitionModule> planableModules = new ArrayList<>();
-		for (IgnitionModule ignitionModule : settingsManager.getIgnitionModules()) {
-			if (ignitionModule.getModuleConfig().isConfigured()) {
-				planableModules.add(ignitionModule);
-			}
-		}
-		nextScreen.putExtra(PlanFireworkActivity.IGNITION_MODULES, planableModules);
 		nextScreen.putExtra(PlanFireworkActivity.PLANNED_FIREWORK, plannedFirework.getName());
 		startActivity(nextScreen);
 	}
