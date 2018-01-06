@@ -1,6 +1,7 @@
 package de.noxworks.noxnition.planned;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,22 +18,37 @@ import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireTrigger;
 import de.noxworks.noxnition.persistence.FireTriggerGroup;
+import de.noxworks.noxnition.persistence.PlannedFirework;
 
 public class ChannelSelectionFragment extends Fragment {
 
 	private final FireTriggerGroup fireTriggerGroup;
 	private final IgnitionModule ignitionModule;
+	private final PlannedFirework plannedFirework;
 
-	public ChannelSelectionFragment(IgnitionModule ignitionModule, FireTriggerGroup fireTriggerGroup) {
+	public ChannelSelectionFragment(IgnitionModule ignitionModule, FireTriggerGroup fireTriggerGroup,
+	    PlannedFirework plannedFirework) {
 		this.ignitionModule = ignitionModule;
 		this.fireTriggerGroup = fireTriggerGroup;
+		this.plannedFirework = plannedFirework;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.channel_selection_fragment, container, false);
 
-		FireTrigger fireTrigger = getFireTriggerOfModule(ignitionModule);
+		FireTrigger fireTrigger = getFireTriggerOfModule(fireTriggerGroup);
+
+		Set<Integer> alreadyAssignedChannels = new HashSet<>();
+		List<FireTriggerGroup> fireTriggerGroups = plannedFirework.getFireTriggerGroups();
+		for (FireTriggerGroup fireTriggerGroup : fireTriggerGroups) {
+			if (fireTriggerGroup != this.fireTriggerGroup) {
+				FireTrigger fireTriggerOfModule = getFireTriggerOfModule(fireTriggerGroup);
+				if (fireTriggerOfModule != null) {
+					alreadyAssignedChannels.addAll(fireTriggerOfModule.getChannels());
+				}
+			}
+		}
 
 		List<Integer> channels = new ArrayList<>();
 		if (fireTrigger != null) {
@@ -65,11 +81,14 @@ public class ChannelSelectionFragment extends Fragment {
 				if (channels.contains(channelNumber)) {
 					button.setChecked(true);
 				}
+				if (alreadyAssignedChannels.contains(channelNumber)) {
+					button.setEnabled(false);
+				}
 				button.setOnClickListener(new OnClickListener() {
 
 					@Override
 					public void onClick(View v) {
-						FireTrigger fireTrigger = getFireTriggerOfModule(ignitionModule);
+						FireTrigger fireTrigger = getFireTriggerOfModule(fireTriggerGroup);
 						if (button.isChecked()) {
 							if (fireTrigger == null) {
 								fireTrigger = new FireTrigger(ignitionModule);
@@ -91,7 +110,7 @@ public class ChannelSelectionFragment extends Fragment {
 		return rootView;
 	}
 
-	private FireTrigger getFireTriggerOfModule(final IgnitionModule ignitionModule) {
+	private FireTrigger getFireTriggerOfModule(FireTriggerGroup fireTriggerGroup) {
 		List<FireTrigger> fireTriggers = fireTriggerGroup.getFireTriggers();
 		for (FireTrigger fireTrigger : fireTriggers) {
 			if (fireTrigger.getModule().equals(ignitionModule)) {

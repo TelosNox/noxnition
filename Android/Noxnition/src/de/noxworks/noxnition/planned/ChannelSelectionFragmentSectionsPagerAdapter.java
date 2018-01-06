@@ -7,22 +7,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireTriggerGroup;
+import de.noxworks.noxnition.persistence.PlannedFirework;
 
 public class ChannelSelectionFragmentSectionsPagerAdapter extends FragmentStatePagerAdapter {
 
-	private FireTriggerGroup fireTriggerGroup;
-	private List<IgnitionModule> ignitionModules;
+	private final FireTriggerGroup fireTriggerGroup;
+	private final List<IgnitionModule> ignitionModules;
+	private final PlannedFirework plannedFirework;
 
 	public ChannelSelectionFragmentSectionsPagerAdapter(FragmentManager supportFragmentManager,
-	    FireTriggerGroup fireTriggerGroup, List<IgnitionModule> ignitionModules) {
+	    FireTriggerGroup fireTriggerGroup, PlannedFirework plannedFirework, List<IgnitionModule> ignitionModules) {
 		super(supportFragmentManager);
 		this.fireTriggerGroup = fireTriggerGroup;
+		this.plannedFirework = plannedFirework;
 		this.ignitionModules = ignitionModules;
 	}
 
 	@Override
 	public Fragment getItem(int position) {
-		return new ChannelSelectionFragment(ignitionModules.get(position), fireTriggerGroup);
+		return new ChannelSelectionFragment(ignitionModules.get(position), fireTriggerGroup, plannedFirework);
 	}
 
 	@Override

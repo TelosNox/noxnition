@@ -16,6 +16,7 @@ public class ChannelSelectionActivity extends BaseActivity {
 	public static final String FIRE_TRIGGER_GROUP_INDEX = "fire_trigger_group_index";
 
 	private FireTriggerGroup fireTriggerGroup;
+	private PlannedFirework plannedFirework;
 
 	private ChannelSelectionFragmentSectionsPagerAdapter mSectionsPagerAdapter;
 	private ViewPager mViewPager;
@@ -33,6 +34,7 @@ public class ChannelSelectionActivity extends BaseActivity {
 					List<FireTriggerGroup> fireTriggerGroups = plannedFirework.getFireTriggerGroups();
 					FireTriggerGroup fireTriggerGroup = fireTriggerGroups.get(index);
 					this.fireTriggerGroup = fireTriggerGroup;
+					this.plannedFirework = plannedFirework;
 					break;
 				}
 			}
@@ -41,7 +43,7 @@ public class ChannelSelectionActivity extends BaseActivity {
 		setContentView(R.layout.module_fragment_layout);
 
 		mSectionsPagerAdapter = new ChannelSelectionFragmentSectionsPagerAdapter(getSupportFragmentManager(),
-		    fireTriggerGroup, settingsManager.getPlanableIgnitionModules());
+		    fireTriggerGroup, plannedFirework, settingsManager.getPlanableIgnitionModules());
 
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
