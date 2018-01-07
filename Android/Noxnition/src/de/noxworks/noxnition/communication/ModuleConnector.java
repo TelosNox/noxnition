@@ -10,12 +10,12 @@ public class ModuleConnector {
 
 	private final String ipAdress;
 	private final ArmRequestHandler armRequestHandler;
-	private final StateCheckRequestHandler stateCheckRequestHandler;
+	private final StateCheckRequestHandler<?> stateCheckRequestHandler;
 	private final FireChannelRequestHandler<?> fireChannelRequestHandler;
 	private final CheckChannelStatesRequestHandler<?> checkChannelStatesRequestHandler;
 
 	public ModuleConnector(String ipAdress, ArmRequestHandler armRequestHandler,
-	    StateCheckRequestHandler stateCheckRequestHandler, FireChannelRequestHandler<?> fireChannelRequestHandler,
+	    StateCheckRequestHandler<?> stateCheckRequestHandler, FireChannelRequestHandler<?> fireChannelRequestHandler,
 	    CheckChannelStatesRequestHandler<?> checkChannelStatesRequestHandler) {
 		this.ipAdress = ipAdress;
 		this.armRequestHandler = armRequestHandler;

@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 import de.noxworks.noxnition.IFireResultHandler;
 import de.noxworks.noxnition.IMessageable;
+import de.noxworks.noxnition.IStateCheckResultHandler;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.communication.FireChannelResult;
 import de.noxworks.noxnition.communication.FireFragmentModuleConnector;
@@ -34,7 +35,8 @@ import de.noxworks.noxnition.communication.ModuleConnector;
 import de.noxworks.noxnition.communication.StateCheckResult;
 import de.noxworks.noxnition.model.IgnitionModule;
 
-public class FireFragment extends Fragment implements IMessageable, IFireResultHandler, IChannelStatesHandler {
+public class FireFragment extends Fragment
+    implements IMessageable, IFireResultHandler, IChannelStatesHandler, IStateCheckResultHandler {
 
 	private static final String ARG_SECTION_NUMBER = "section_number";
 	public static final String ARG_IGNITION_MODULE = "ignition_module";

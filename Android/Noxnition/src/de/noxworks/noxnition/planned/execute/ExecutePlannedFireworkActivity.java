@@ -29,8 +29,10 @@ import de.noxworks.noxnition.StringUtil;
 import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
 import de.noxworks.noxnition.communication.FireChannelResult;
 import de.noxworks.noxnition.communication.ModuleConnector;
+import de.noxworks.noxnition.communication.StateCheckResult;
 import de.noxworks.noxnition.handler.CheckChannelStatesRequestHandler;
 import de.noxworks.noxnition.handler.FireChannelRequestHandler;
+import de.noxworks.noxnition.handler.StateCheckRequestHandler;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireAction;
 import de.noxworks.noxnition.persistence.FireTrigger;
@@ -48,7 +50,6 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	private Handler handler;
 
 	private Map<IgnitionModule, ModuleConnector> connectorsByModule = new HashMap<>();
-	private Map<IgnitionModule, ChannelStatesHandler> channelStatesByModule = new HashMap<>();
 	private Button fireButton;
 	private FireAction currentFireAction;
 	private ProgressBar progressBar;
@@ -57,6 +58,10 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	private FiredActionVisualization firedAction;
 	private CountDownTimer timer;
 	private int fireCommandsToConfirm = 0;
+
+	private Set<IgnitionModule> requiredModules;
+	private Map<IgnitionModule, ChannelStatesHandler> channelStatesByModule;
+	private Map<IgnitionModule, StateCheckResultHandler> moduleStatesByModule;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +84,8 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 			}
 		}
 
+		channelStatesByModule = new HashMap<>();
+		moduleStatesByModule = new HashMap<>();
 		for (IgnitionModule ignitionModule : ignitionModules) {
 			String ipAddress = ignitionModule.getIpAddress();
 			if (ipAddress != null) {
@@ -90,8 +97,10 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 				ChannelStatesHandler channelStatesHandler = new ChannelStatesHandler(channels);
 				channelStatesByModule.put(ignitionModule, channelStatesHandler);
-				ModuleConnector moduleConnector = new ModuleConnector(ipAddress, null, null,
-				    new FireChannelRequestHandler<>(this, null),
+				StateCheckResultHandler moduleStateHandler = new StateCheckResultHandler();
+				moduleStatesByModule.put(ignitionModule, moduleStateHandler);
+				ModuleConnector moduleConnector = new ModuleConnector(ipAddress, null,
+				    new StateCheckRequestHandler<>(moduleStateHandler, handler), new FireChannelRequestHandler<>(this, null),
 				    new CheckChannelStatesRequestHandler<>(channelStatesHandler, handler));
 				connectorsByModule.put(ignitionModule, moduleConnector);
 			}
@@ -103,6 +112,7 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 			if (fireTriggers.isEmpty()) {
 				showMessage("Trigger has no assigned channels: " + fireAction.getFireTriggerGroup().getName());
 				finish();
+				return;
 			}
 			for (FireTrigger fireTrigger : fireTriggers) {
 				IgnitionModule requiredModule = fireTrigger.getModule();
@@ -115,10 +125,11 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 			}
 		}
 
-		Set<IgnitionModule> requiredModules = requiredChannelsByModule.keySet();
+		requiredModules = requiredChannelsByModule.keySet();
 		if (!connectorsByModule.keySet().containsAll(requiredModules)) {
 			showMessage("Not all required modules are online");
 			finish();
+			return;
 		}
 
 		for (IgnitionModule ignitionModule : requiredModules) {
@@ -129,8 +140,14 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 		String message = "Not all required channels are connected:";
 		boolean channelsOk = true;
 		for (IgnitionModule ignitionModule : requiredModules) {
+			String moduleName = ignitionModule.getModuleConfig().getName();
 			Map<Integer, Boolean> channelStates = channelStatesByModule.get(ignitionModule).getChannelStates();
 			List<Integer> requiredChannels = requiredChannelsByModule.get(ignitionModule);
+			if (channelStates == null) {
+				showMessage("No channel state answer from module: " + moduleName);
+				finish();
+				return;
+			}
 			List<Integer> activeChannels = new ArrayList<>();
 			for (Entry<Integer, Boolean> entry : channelStates.entrySet()) {
 				if (entry.getValue()) {
@@ -143,12 +160,44 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 				Collections.sort(list);
 				list.removeAll(activeChannels);
 				String channels = StringUtil.join(list);
-				message += "\n" + ignitionModule.getModuleConfig().getName() + " : " + channels;
+				message += "\n" + moduleName + " : " + channels;
 			}
 		}
 		if (!channelsOk) {
 			showMessage(message);
 			finish();
+			return;
+		}
+
+		for (IgnitionModule ignitionModule : requiredModules) {
+			ModuleConnector moduleConnector = connectorsByModule.get(ignitionModule);
+			moduleConnector.sendArmRequest();
+		}
+
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+		}
+
+		for (IgnitionModule ignitionModule : requiredModules) {
+			ModuleConnector moduleConnector = connectorsByModule.get(ignitionModule);
+			moduleConnector.sendStateCheckRequest();
+		}
+
+		for (IgnitionModule ignitionModule : requiredModules) {
+			String moduleName = ignitionModule.getModuleConfig().getName();
+			StateCheckResultHandler stateCheckResultHandler = moduleStatesByModule.get(ignitionModule);
+			StateCheckResult result = stateCheckResultHandler.getResult();
+			if (result == null) {
+				showMessage("No module state answer from module: " + moduleName);
+				finish();
+				return;
+			}
+			if (!result.isArmed()) {
+				showMessage("Module is not armed: " + moduleName);
+				finish();
+				return;
+			}
 		}
 
 		initMainLayout();
@@ -301,5 +350,14 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 				setCurrentActionBackgroundColors(Color.RED);
 			}
 		});
+	}
+
+	@Override
+	public void onBackPressed() {
+		for (IgnitionModule ignitionModule : requiredModules) {
+			ModuleConnector moduleConnector = connectorsByModule.get(ignitionModule);
+			moduleConnector.sendDisArmRequest();
+		}
+		super.onBackPressed();
 	}
 }
