@@ -131,12 +131,20 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 			@Override
 			public void onTick(long millisUntilFinished) {
-				long progress = (delay - millisUntilFinished) * 100 / delay;
+				long millis = delay - millisUntilFinished;
+				long progress = millis * 100 / delay;
+				int seconds = (int) (millis / 1000);
+				int remainingDelay = currentFireAction.getDelay() - seconds;
+				String delayText = remainingDelay + " sec";
+				timeText.setText(delayText);
 				progressBar.setProgress((int) progress);
 			}
 
 			@Override
 			public void onFinish() {
+				String delayText = 0 + " sec";
+				timeText.setText(delayText);
+				progressBar.setProgress(100);
 				setCurrentActionBackgroundColors(Color.GREEN);
 				if (delay == 0) {
 					fireCurrentAction();
