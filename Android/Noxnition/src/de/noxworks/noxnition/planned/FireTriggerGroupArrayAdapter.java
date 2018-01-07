@@ -2,7 +2,6 @@ package de.noxworks.noxnition.planned;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
@@ -13,6 +12,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.StringUtil;
 import de.noxworks.noxnition.persistence.FireTrigger;
 import de.noxworks.noxnition.persistence.FireTriggerGroup;
 
@@ -91,13 +91,7 @@ public class FireTriggerGroupArrayAdapter extends BaseExpandableListAdapter {
 		moduleNameText.setText(moduleName);
 		List<Integer> channels = new ArrayList<>(child.getChannels());
 		Collections.sort(channels);
-		StringBuilder s = new StringBuilder();
-		for (Iterator<Integer> i = channels.iterator(); i.hasNext();) {
-			s.append(i.next());
-			if (i.hasNext())
-				s.append(",");
-		}
-		String channelsString = s.toString();
+		String channelsString = StringUtil.join(channels);
 		TextView channelText = (TextView) vi.findViewById(R.id.fireTrigger_channel);
 		channelText.setText(channelsString);
 		return vi;

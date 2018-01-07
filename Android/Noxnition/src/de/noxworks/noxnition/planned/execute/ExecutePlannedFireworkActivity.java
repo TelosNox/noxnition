@@ -1,9 +1,12 @@
 package de.noxworks.noxnition.planned.execute;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,9 +25,11 @@ import android.widget.TextView;
 import de.noxworks.noxnition.BaseActivity;
 import de.noxworks.noxnition.IFireResultHandler;
 import de.noxworks.noxnition.R;
+import de.noxworks.noxnition.StringUtil;
 import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
 import de.noxworks.noxnition.communication.FireChannelResult;
 import de.noxworks.noxnition.communication.ModuleConnector;
+import de.noxworks.noxnition.handler.CheckChannelStatesRequestHandler;
 import de.noxworks.noxnition.handler.FireChannelRequestHandler;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireAction;
@@ -43,6 +48,7 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	private Handler handler;
 
 	private Map<IgnitionModule, ModuleConnector> connectorsByModule = new HashMap<>();
+	private Map<IgnitionModule, ChannelStatesHandler> channelStatesByModule = new HashMap<>();
 	private Button fireButton;
 	private FireAction currentFireAction;
 	private ProgressBar progressBar;
@@ -76,20 +82,68 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 		for (IgnitionModule ignitionModule : ignitionModules) {
 			String ipAddress = ignitionModule.getIpAddress();
 			if (ipAddress != null) {
+				List<Integer> channels = new ArrayList<>();
+				int numberOfChannels = ignitionModule.getModuleConfig().getChannels();
+				for (int i = 1; i <= numberOfChannels; i++) {
+					channels.add(i);
+				}
+
+				ChannelStatesHandler channelStatesHandler = new ChannelStatesHandler(channels);
+				channelStatesByModule.put(ignitionModule, channelStatesHandler);
 				ModuleConnector moduleConnector = new ModuleConnector(ipAddress, null, null,
-				    new FireChannelRequestHandler<ExecutePlannedFireworkActivity>(this, null), null);
+				    new FireChannelRequestHandler<>(this, null),
+				    new CheckChannelStatesRequestHandler<>(channelStatesHandler, handler));
 				connectorsByModule.put(ignitionModule, moduleConnector);
 			}
 		}
 
+		Map<IgnitionModule, List<Integer>> requiredChannelsByModule = new HashMap<>();
 		for (FireAction fireAction : fireActions) {
 			for (FireTrigger fireTrigger : fireAction.getFireTriggerGroup().getFireTriggers()) {
 				IgnitionModule requiredModule = fireTrigger.getModule();
-				if (!connectorsByModule.containsKey(requiredModule)) {
-					showMessage("Not all required modules are online");
-					finish();
+				List<Integer> channels = requiredChannelsByModule.get(requiredModule);
+				if (channels == null) {
+					channels = new ArrayList<>();
+					requiredChannelsByModule.put(requiredModule, channels);
+				}
+				channels.addAll(fireTrigger.getChannels());
+			}
+		}
+
+		Set<IgnitionModule> requiredModules = requiredChannelsByModule.keySet();
+		if (!connectorsByModule.keySet().containsAll(requiredModules)) {
+			showMessage("Not all required modules are online");
+			finish();
+		}
+
+		for (IgnitionModule ignitionModule : requiredModules) {
+			ModuleConnector moduleConnector = connectorsByModule.get(ignitionModule);
+			moduleConnector.checkChannelStates();
+		}
+
+		String message = "Not all required channels are connected:";
+		boolean channelsOk = true;
+		for (IgnitionModule ignitionModule : requiredModules) {
+			Map<Integer, Boolean> channelStates = channelStatesByModule.get(ignitionModule).getChannelStates();
+			List<Integer> requiredChannels = requiredChannelsByModule.get(ignitionModule);
+			List<Integer> activeChannels = new ArrayList<>();
+			for (Entry<Integer, Boolean> entry : channelStates.entrySet()) {
+				if (entry.getValue()) {
+					activeChannels.add(entry.getKey());
 				}
 			}
+			if (!activeChannels.containsAll(requiredChannels)) {
+				channelsOk = false;
+				List<Integer> list = new ArrayList<>(requiredChannels);
+				Collections.sort(list);
+				list.removeAll(activeChannels);
+				String channels = StringUtil.join(list);
+				message += "\n" + ignitionModule.getModuleConfig().getName() + " : " + channels;
+			}
+		}
+		if (!channelsOk) {
+			showMessage(message);
+			finish();
 		}
 
 		initMainLayout();

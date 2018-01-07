@@ -1,5 +1,6 @@
 package de.noxworks.noxnition.direct.execute;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -33,7 +34,7 @@ import de.noxworks.noxnition.communication.ModuleConnector;
 import de.noxworks.noxnition.communication.StateCheckResult;
 import de.noxworks.noxnition.model.IgnitionModule;
 
-public class FireFragment extends Fragment implements IMessageable, IFireResultHandler {
+public class FireFragment extends Fragment implements IMessageable, IFireResultHandler, IChannelStatesHandler {
 
 	private static final String ARG_SECTION_NUMBER = "section_number";
 	public static final String ARG_IGNITION_MODULE = "ignition_module";
@@ -170,8 +171,16 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 		connectionState.setTextColor(color);
 	}
 
-	public void setChannelState(final ToggleButton channel, final boolean state) {
-		channel.setChecked(state);
+	@Override
+	public void handleChannelState(final int channel, final boolean state) {
+		final ToggleButton toggleButton = identifierByChannelButton.get(channel);
+		uiHandler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				toggleButton.setChecked(state);
+			}
+		});
 	}
 
 	private void startTimer() {
@@ -214,9 +223,8 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				for (Map.Entry<Integer, ToggleButton> entry : identifierByChannelButton.entrySet()) {
-					ToggleButton channel = entry.getValue();
-					setChannelState(channel, false);
+				for (ToggleButton toggleButton : identifierByChannelButton.values()) {
+					toggleButton.setChecked(false);
 				}
 				moduleConnector.checkChannelStates();
 				return true;
@@ -267,5 +275,10 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 				}
 			}
 		});
+	}
+
+	@Override
+	public Collection<Integer> getChannels() {
+		return identifierByChannelButton.keySet();
 	}
 }
