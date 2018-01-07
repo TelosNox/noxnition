@@ -113,6 +113,7 @@ void initModuleServer() {
   server.begin();
   server.on("/state", getStatus);
   server.on("/arm", arm);
+  server.on("/disarm", disarm);
   server.on("/fire", fire);
   server.on("/check", check);
   server.on("/getConfig", getConfig);
@@ -285,13 +286,19 @@ void setRegisterOutput() {
 }
 
 void arm() {
-  armInternal();
+  armInternal(true);
 
   server.send(200, "application/json", "operation=1");
 }
 
-void armInternal() {
-  armed = !armed;
+void disarm() {
+  armInternal(false);
+
+  server.send(200, "application/json", "operation=1");
+}
+
+void armInternal(boolean arm) {
+  armed = arm;
   digitalWrite(pinMain, armed);
 }
 
@@ -303,7 +310,7 @@ void check() {
   
   boolean wasArmed = armed;
   if (armed) {
-    armInternal();
+    armInternal(false);
     delay(20);
   }
   int voltageIn = analogRead(A0);

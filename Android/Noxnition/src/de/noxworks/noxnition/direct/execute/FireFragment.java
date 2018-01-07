@@ -85,7 +85,11 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 			@Override
 			public void onClick(View v) {
 				armedSwitch.setChecked(!armedSwitch.isChecked());
-				moduleConnector.sendArmRequest();
+				if (armedSwitch.isChecked()) {
+					moduleConnector.sendDisArmRequest();
+				} else {
+					moduleConnector.sendArmRequest();
+				}
 			}
 		});
 

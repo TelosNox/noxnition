@@ -1,6 +1,5 @@
 package de.noxworks.noxnition.planned;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Dialog;
@@ -27,7 +26,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
-import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireAction;
 import de.noxworks.noxnition.persistence.FireTriggerGroup;
 import de.noxworks.noxnition.persistence.PlannedFirework;
@@ -39,7 +37,6 @@ public class PlanFireActionsFragment extends Fragment {
 	public static final String PLANNED_FIREWORK = "planned_firework";
 	private static final int DELETE_FIRE_ACTION = 1;
 
-	private List<IgnitionModule> ignitionModules = new ArrayList<>();
 	private PlannedFirework plannedFirework;
 
 	private FireActionArrayAdapter fireActionArrayAdapter;
@@ -143,10 +140,7 @@ public class PlanFireActionsFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				Intent nextScreen = new Intent(context, ExecutePlannedFireworkActivity.class);
-				ArrayList<IgnitionModule> nextModules = new ArrayList<>(ignitionModules);
-				nextScreen.putExtra(ExecutePlannedFireworkActivity.IGNITION_MODULES, nextModules);
-				ArrayList<FireAction> nextFireActions = new ArrayList<>(plannedFirework.getFireActions());
-				nextScreen.putExtra(ExecutePlannedFireworkActivity.FIRE_ACTIONS, nextFireActions);
+				nextScreen.putExtra(ExecutePlannedFireworkActivity.PLANNED_FIREWORK, plannedFirework.getName());
 				startActivity(nextScreen);
 			}
 		});

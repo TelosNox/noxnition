@@ -28,6 +28,10 @@ public class ModuleConnector {
 		execute(new RequestTask(ipAdress, "arm", armRequestHandler));
 	}
 
+	public void sendDisArmRequest() {
+		execute(new RequestTask(ipAdress, "disarm", armRequestHandler));
+	}
+
 	public void sendStateCheckRequest() {
 		execute(new RequestTask(ipAdress, "state", stateCheckRequestHandler));
 	}

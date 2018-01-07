@@ -1,6 +1,5 @@
 package de.noxworks.noxnition.planned.execute;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +29,11 @@ import de.noxworks.noxnition.handler.FireChannelRequestHandler;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireAction;
 import de.noxworks.noxnition.persistence.FireTrigger;
+import de.noxworks.noxnition.persistence.PlannedFirework;
 
 public class ExecutePlannedFireworkActivity extends BaseActivity implements IFireResultHandler {
 
-	public static final String IGNITION_MODULES = "ignition_modules";
-	public static final String FIRE_ACTIONS = "fireActions";
+	public static final String PLANNED_FIREWORK = "planned_firework";
 
 	private List<FireAction> fireActions = new ArrayList<>();
 	private List<IgnitionModule> ignitionModules;
@@ -43,7 +42,7 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 	private Handler handler;
 
-	private Map<String, ModuleConnector> connectorsByIp = new HashMap<>();
+	private Map<IgnitionModule, ModuleConnector> connectorsByModule = new HashMap<>();
 	private Button fireButton;
 	private FireAction currentFireAction;
 	private ProgressBar progressBar;
@@ -56,27 +55,41 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		ignitionModules = settingsManager.getIgnitionModules();
+
 		setTitle("Feuerwerk zünden");
 
 		handler = new Handler();
 
-		ignitionModules = settingsManager.getIgnitionModules();
-
 		Intent intent = getIntent();
 		if (intent != null) {
-			Serializable actionsSerializable = intent.getSerializableExtra(FIRE_ACTIONS);
-			if (actionsSerializable != null) {
-				@SuppressWarnings("unchecked")
-				ArrayList<FireAction> list = (ArrayList<FireAction>) actionsSerializable;
-				fireActions.addAll(list);
+			String plannedFireworkName = intent.getStringExtra(PLANNED_FIREWORK);
+			for (PlannedFirework plannedFirework : settingsManager.getPlannedFireworks()) {
+				if (plannedFirework.getName().equals(plannedFireworkName)) {
+					fireActions.addAll(plannedFirework.getFireActions());
+					break;
+				}
 			}
 		}
 
 		for (IgnitionModule ignitionModule : ignitionModules) {
 			String ipAddress = ignitionModule.getIpAddress();
-			ModuleConnector moduleConnector = new ModuleConnector(ipAddress, null, null,
-			    new FireChannelRequestHandler<ExecutePlannedFireworkActivity>(this, null), null);
-			connectorsByIp.put(ipAddress, moduleConnector);
+			if (ipAddress != null) {
+				ModuleConnector moduleConnector = new ModuleConnector(ipAddress, null, null,
+				    new FireChannelRequestHandler<ExecutePlannedFireworkActivity>(this, null), null);
+				connectorsByModule.put(ignitionModule, moduleConnector);
+			}
+		}
+
+		for (FireAction fireAction : fireActions) {
+			for (FireTrigger fireTrigger : fireAction.getFireTriggerGroup().getFireTriggers()) {
+				IgnitionModule requiredModule = fireTrigger.getModule();
+				if (!connectorsByModule.containsKey(requiredModule)) {
+					showMessage("Not all required modules are online");
+					finish();
+				}
+			}
 		}
 
 		initMainLayout();
@@ -173,8 +186,8 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 			fireCommandsToConfirm += fireTrigger.getChannels().size();
 		}
 		for (FireTrigger fireTrigger : fireTriggers) {
-			String ipAddress = fireTrigger.getModule().getIpAddress();
-			ModuleConnector moduleConnector = connectorsByIp.get(ipAddress);
+			IgnitionModule module = fireTrigger.getModule();
+			ModuleConnector moduleConnector = connectorsByModule.get(module);
 			for (Integer channel : fireTrigger.getChannels()) {
 				moduleConnector.fireChannel(channel);
 			}
