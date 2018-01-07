@@ -99,7 +99,12 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 		Map<IgnitionModule, List<Integer>> requiredChannelsByModule = new HashMap<>();
 		for (FireAction fireAction : fireActions) {
-			for (FireTrigger fireTrigger : fireAction.getFireTriggerGroup().getFireTriggers()) {
+			List<FireTrigger> fireTriggers = fireAction.getFireTriggerGroup().getFireTriggers();
+			if (fireTriggers.isEmpty()) {
+				showMessage("Trigger has no assigned channels: " + fireAction.getFireTriggerGroup().getName());
+				finish();
+			}
+			for (FireTrigger fireTrigger : fireTriggers) {
 				IgnitionModule requiredModule = fireTrigger.getModule();
 				List<Integer> channels = requiredChannelsByModule.get(requiredModule);
 				if (channels == null) {
