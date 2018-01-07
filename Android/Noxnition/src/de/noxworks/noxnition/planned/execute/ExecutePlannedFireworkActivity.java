@@ -29,6 +29,7 @@ import de.noxworks.noxnition.communication.ModuleConnector;
 import de.noxworks.noxnition.handler.FireChannelRequestHandler;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireAction;
+import de.noxworks.noxnition.persistence.FireTrigger;
 
 public class ExecutePlannedFireworkActivity extends BaseActivity implements IFireResultHandler {
 
@@ -36,7 +37,7 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	public static final String FIRE_ACTIONS = "fireActions";
 
 	private List<FireAction> fireActions = new ArrayList<>();
-	private List<IgnitionModule> ignitionModules = new ArrayList<>();
+	private List<IgnitionModule> ignitionModules;
 
 	private FireActionArrayAdapter fireActionArrayAdapter;
 
@@ -46,16 +47,11 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	private Button fireButton;
 	private FireAction currentFireAction;
 	private ProgressBar progressBar;
-	private TextView moduleText;
-	private TextView channelText;
 	private TextView timeText;
 	private TextView nameText;
 	private FiredActionVisualization firedAction;
 	private CountDownTimer timer;
-
-	public List<IgnitionModule> getIgnitionModules() {
-		return ignitionModules;
-	}
+	private int fireCommandsToConfirm = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,14 +60,10 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 		handler = new Handler();
 
+		ignitionModules = settingsManager.getIgnitionModules();
+
 		Intent intent = getIntent();
 		if (intent != null) {
-			Serializable modulesSerializable = intent.getSerializableExtra(IGNITION_MODULES);
-			if (modulesSerializable != null) {
-				@SuppressWarnings("unchecked")
-				ArrayList<IgnitionModule> list = (ArrayList<IgnitionModule>) modulesSerializable;
-				ignitionModules.addAll(list);
-			}
 			Serializable actionsSerializable = intent.getSerializableExtra(FIRE_ACTIONS);
 			if (actionsSerializable != null) {
 				@SuppressWarnings("unchecked")
@@ -99,11 +91,8 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 		firedAction = initFiredAction();
 
-		moduleText = (TextView) findViewById(R.id.fireactionRow_module);
-		channelText = (TextView) findViewById(R.id.fireactionRow_channel);
-		timeText = (TextView) findViewById(R.id.fireactionRow_time);
 		nameText = (TextView) findViewById(R.id.fireactionRow_name);
-		channelText.setTextColor(Color.GRAY);
+		timeText = (TextView) findViewById(R.id.fireactionRow_time);
 		timeText.setTextColor(Color.GRAY);
 
 		nextFireAction();
@@ -123,20 +112,15 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 	private void nextFireAction() {
 		currentFireAction = fireActions.get(0);
-		// moduleText.setText(currentFireAction.getModule().getModuleConfig().getName());
-		// nameText.setText(currentFireAction.getName());
-		// channelText.setText("Channel " + currentFireAction.getChannel());
+		nameText.setText(currentFireAction.getFireTriggerGroup().getName());
 		String delayText = currentFireAction.getDelay() + " sec";
 		timeText.setText(delayText);
 		fireActions.remove(currentFireAction);
 	}
 
 	private FiredActionVisualization initFiredAction() {
-		final TextView runningModuleText = (TextView) findViewById(R.id.runningFireaction_module);
-		final TextView runningChannelText = (TextView) findViewById(R.id.runningFireaction_channel);
-		final TextView runningTimeText = (TextView) findViewById(R.id.runningFireaction_time);
 		final TextView runningNameText = (TextView) findViewById(R.id.runningFireaction_name);
-		return new FiredActionVisualization(runningModuleText, runningChannelText, runningTimeText, runningNameText);
+		return new FiredActionVisualization(runningNameText);
 	}
 
 	private void runProgress() {
@@ -167,8 +151,6 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 	}
 
 	private void setCurrentActionBackgroundColors(int color) {
-		moduleText.setBackgroundColor(color);
-		channelText.setBackgroundColor(color);
 		timeText.setBackgroundColor(color);
 		nameText.setBackgroundColor(color);
 	}
@@ -177,30 +159,40 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 		if (timer != null) {
 			timer.cancel();
 		}
-		// ModuleConnector moduleConnector =
-		// connectorsByIp.get(currentFireAction.getModule().getIpAddress());
-		// moduleConnector.fireChannel(currentFireAction.getChannel());
+		fireCommandsToConfirm = 0;
+		List<FireTrigger> fireTriggers = currentFireAction.getFireTriggerGroup().getFireTriggers();
+		for (FireTrigger fireTrigger : fireTriggers) {
+			fireCommandsToConfirm += fireTrigger.getChannels().size();
+		}
+		for (FireTrigger fireTrigger : fireTriggers) {
+			String ipAddress = fireTrigger.getModule().getIpAddress();
+			ModuleConnector moduleConnector = connectorsByIp.get(ipAddress);
+			for (Integer channel : fireTrigger.getChannels()) {
+				moduleConnector.fireChannel(channel);
+			}
+		}
 		setCurrentActionBackgroundColors(Color.TRANSPARENT);
 	}
 
 	private void channelFiredSuccess() {
-		handler.post(new Runnable() {
+		fireCommandsToConfirm--;
+		if (fireCommandsToConfirm == 0) {
+			handler.post(new Runnable() {
 
-			@Override
-			public void run() {
-				firedAction.setFired(currentFireAction);
-				moduleText.setText("");
-				nameText.setText("");
-				channelText.setText("");
-				timeText.setText("");
-				progressBar.setProgress(0);
-				if (!fireActions.isEmpty()) {
-					nextFireAction();
-					fireActionArrayAdapter.notifyDataSetChanged();
-					runProgress();
+				@Override
+				public void run() {
+					firedAction.setFired(currentFireAction);
+					nameText.setText("");
+					timeText.setText("");
+					progressBar.setProgress(0);
+					if (!fireActions.isEmpty()) {
+						nextFireAction();
+						fireActionArrayAdapter.notifyDataSetChanged();
+						runProgress();
+					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	@Override

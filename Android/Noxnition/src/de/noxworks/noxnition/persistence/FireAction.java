@@ -49,6 +49,9 @@ public class FireAction implements Serializable {
 		JSONObject json = new JSONObject(jsonString);
 		String fireTriggerGroupName = json.getString(FIRE_TRIGGER_GROUP);
 		FireTriggerGroup fireTriggerGroup = fireTriggerGroups.get(fireTriggerGroupName);
+		if (fireTriggerGroup == null) {
+			return null;
+		}
 		int delay = json.getInt(DELAY);
 		return new FireAction(fireTriggerGroup, delay);
 	}

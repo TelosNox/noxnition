@@ -6,27 +6,15 @@ import de.noxworks.noxnition.persistence.FireAction;
 
 public class FiredActionVisualization {
 
-	final TextView runningModuleText;
-	final TextView runningChannelText;
-	final TextView runningTimeText;
 	final TextView runningNameText;
 
-	public FiredActionVisualization(TextView runningModuleText, TextView runningChannelText, TextView runningTimeText,
-	    TextView runningNameText) {
-		this.runningModuleText = runningModuleText;
-		this.runningChannelText = runningChannelText;
-		this.runningTimeText = runningTimeText;
+	public FiredActionVisualization(TextView runningNameText) {
 		this.runningNameText = runningNameText;
 
-		runningModuleText.setTextColor(Color.RED);
-		runningChannelText.setTextColor(Color.RED);
-		runningTimeText.setTextColor(Color.RED);
 		runningNameText.setTextColor(Color.RED);
 	}
 
 	public void setFired(FireAction fireAction) {
-		// runningModuleText.setText(fireAction.getModule().getModuleConfig().getName());
-		// runningNameText.setText(fireAction.getName());
-		// runningChannelText.setText("Channel " + fireAction.getChannel());
+		runningNameText.setText(fireAction.getFireTriggerGroup().getName());
 	}
 }

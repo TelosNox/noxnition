@@ -83,7 +83,9 @@ public class PlannedFirework implements Serializable {
 		for (int i = 0; i < array.length(); i++) {
 			String actionJsonString = array.getString(i);
 			FireAction fireAction = FireAction.fromJson(actionJsonString, fireTriggerGroups);
-			fireActions.add(fireAction);
+			if (fireAction != null) {
+				fireActions.add(fireAction);
+			}
 		}
 		return plannedFirework;
 	}
