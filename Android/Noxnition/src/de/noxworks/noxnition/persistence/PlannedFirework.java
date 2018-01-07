@@ -2,6 +2,7 @@ package de.noxworks.noxnition.persistence;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,19 +70,20 @@ public class PlannedFirework implements Serializable {
 		JSONObject json = new JSONObject(jsonString);
 		String name = json.getString(NAME);
 		PlannedFirework plannedFirework = new PlannedFirework(name);
+		Map<String, FireTriggerGroup> fireTriggerGroups = new HashMap<>();
+		JSONArray triggerGroupArray = json.getJSONArray(TRIGGER_GROUPS);
+		for (int i = 0; i < triggerGroupArray.length(); i++) {
+			String triggerGroupJsonString = triggerGroupArray.getString(i);
+			FireTriggerGroup fireTriggerGroup = FireTriggerGroup.fromJson(triggerGroupJsonString, ignitionModules);
+			fireTriggerGroups.put(fireTriggerGroup.getName(), fireTriggerGroup);
+		}
+		plannedFirework.getFireTriggerGroups().addAll(fireTriggerGroups.values());
 		List<FireAction> fireActions = plannedFirework.getFireActions();
 		JSONArray array = json.getJSONArray(ACTIONS);
 		for (int i = 0; i < array.length(); i++) {
 			String actionJsonString = array.getString(i);
-			FireAction fireAction = FireAction.fromJson(actionJsonString, ignitionModules);
+			FireAction fireAction = FireAction.fromJson(actionJsonString, fireTriggerGroups);
 			fireActions.add(fireAction);
-		}
-		List<FireTriggerGroup> fireTriggerGroups = plannedFirework.getFireTriggerGroups();
-		JSONArray triggerGroupArray = json.getJSONArray(TRIGGER_GROUPS);
-		for (int i = 0; i < triggerGroupArray.length(); i++) {
-			String triggerGroupJsonString = triggerGroupArray.getString(i);
-			FireTriggerGroup fireAction = FireTriggerGroup.fromJson(triggerGroupJsonString, ignitionModules);
-			fireTriggerGroups.add(fireAction);
 		}
 		return plannedFirework;
 	}

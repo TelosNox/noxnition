@@ -123,9 +123,9 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 	private void nextFireAction() {
 		currentFireAction = fireActions.get(0);
-		moduleText.setText(currentFireAction.getModule().getModuleConfig().getName());
-		nameText.setText(currentFireAction.getName());
-		channelText.setText("Channel " + currentFireAction.getChannel());
+		// moduleText.setText(currentFireAction.getModule().getModuleConfig().getName());
+		// nameText.setText(currentFireAction.getName());
+		// channelText.setText("Channel " + currentFireAction.getChannel());
 		String delayText = currentFireAction.getDelay() + " sec";
 		timeText.setText(delayText);
 		fireActions.remove(currentFireAction);
@@ -177,8 +177,9 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 		if (timer != null) {
 			timer.cancel();
 		}
-		ModuleConnector moduleConnector = connectorsByIp.get(currentFireAction.getModule().getIpAddress());
-		moduleConnector.fireChannel(currentFireAction.getChannel());
+		// ModuleConnector moduleConnector =
+		// connectorsByIp.get(currentFireAction.getModule().getIpAddress());
+		// moduleConnector.fireChannel(currentFireAction.getChannel());
 		setCurrentActionBackgroundColors(Color.TRANSPARENT);
 	}
 

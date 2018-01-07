@@ -25,8 +25,8 @@ public class FiredActionVisualization {
 	}
 
 	public void setFired(FireAction fireAction) {
-		runningModuleText.setText(fireAction.getModule().getModuleConfig().getName());
-		runningNameText.setText(fireAction.getName());
-		runningChannelText.setText("Channel " + fireAction.getChannel());
+		// runningModuleText.setText(fireAction.getModule().getModuleConfig().getName());
+		// runningNameText.setText(fireAction.getName());
+		// runningChannelText.setText("Channel " + fireAction.getChannel());
 	}
 }
