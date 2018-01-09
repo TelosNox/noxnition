@@ -1,4 +1,27 @@
 # Feuerwerk Zündmodul + Android App
+Selbstbauprojekt für Funkzündmodule
+
+## Zielgruppe
+Das Projekt richtet sich an interessierte Privatmenschen mit technischen Kenntnissen, die gerne elektrisch ihr Silvesterfeuerwerk zünden wollen.
+Man sollte wissen, wie man grundsätzlich einen Schaltplan liest und wie man an Bauteilen die passenden Pins erkennt (Datenblatt). Und man sollte mit dem Lötkolben umgehen können.
+
+Dieses Projekt richtet sich NICHT an Profis. Wer etwas für professionelle Einsatzzwecke sucht, ist hier leider falsch.
+Dennoch darf natürlich gerne reingeschaut werden.
+
+## Eckdaten
+#### Zündmodul
+- Funkzündmodul mit n x 8 Kanälen
+- Manuelle Scharfschaltung
+- Elektrische Scharfschaltung
+- Durchgangsprüfung der Zünder
+- Kommunikation über WiFi (WPA gesichert)
+- Einfache API über HTTP
+#### Android App
+- Automatische suche von Modulen
+- Direkte Einzelbedienung (Scharfschalten, Durchgangsprüfung, Zündung)
+- Feuerwerksplanung mit virtuellen Kanälen (Zusammenfassung mehrerer Kanäle auch unterschiedlicher Module unter einem Namen)
+- Ablaufplanung mit Zeitverzögerungen (Sekundenbereich)
+- Semiautomatisches Schießen des Feuerwerks
 
 ## Motivation
 Das Projekt entstand durch mehrere Faktoren. Einerseits war ich gerade für den Kettenheizöler Noxmatic mit dem NodeMCU am experimentieren, andererseits hatte ich gerade ein Silvester hinter mir, an dem wir viele Batterien hatte aber diese manuell zündeten.
@@ -38,4 +61,54 @@ Wen man ganz Safe gehen will, kann man den Widerstand auf 5,6Ohm erhöhen. Damit
 Ergänzt man das alles jetzt noch mit der Spannungsmessung und ein paar Schaltern sowie LEDs und Terminals, kommt man zu dem Schaltplan, der schließlich entstanden ist und umgesetzt wurde.
 
 
-tbc...
+## Aufbau des Zündmoduls
+### Bauteile (Basis)
+Die folgenden Bauteile sind nötig, um überhaupt die Grundlage des Moduls zu bilden. Sie bleiben immer gleich, egal wieviele Kanäle man umsetzt.
+- 1x NodeMCU V3 (Lolin)
+- 2x Kippschalter (am besten unterschiedlich, so dass man Hauptschalter von Zündschalter unterscheiden kann)
+- 1x Draht Keramik Lastwiderstand 1,8Ohm 10Watt (R1)
+- 1x IRF9540N (Elektrische Scharfschaltung)
+- 1x IRF3708 (Elektrische Scharfschaltung)
+- 5x R 10k
+- 1x R 4,7k
+- 2x R 1k
+- 1x C 100nF
+- 3x LED 12V (Rot, Gelb, Grün)
+- 1x Bleiakku 12v (z.B. Ultracell UL1.3-12 den verwende ich)
+- 2x Kabelschuhe zum Anschluss des Akkus
+- Ausreichend Draht zum verbinden (Mehrfarbig ist Hilfreich) - 0,5mm Querschnitt für Haupt und Zündleitungen, Steuerleitungen dürfen kleiner sein
+- Flexible Litze für den Akku und sonstige bewegliche Teile (es ist praktisch, wenn man die Platine aus dem Gehäuse nehmen kann, um bei Bedarf Software aufzuspielen)
+
+### Bauteile je 8 Kanäle
+Die folgenden Bauteile sind nötig, um jeweils 8 Kanäle umzusetzen. Diese kann man beliebig vervielfachen.
+- 1x 74HC595 (Schieberegister)
+- 8x R 100
+- 8x R 10k
+- 8x Anschlussterminal (Lautsprecherklemmen z.B.)
+
+Will man 16 Kanäle umsetzen, dann braucht man das einfach doppelt, bei 24 Kanäle 3x etc..
+
+### Schaltplan Erläuterung
+Ich bin kein Profi, was KiCad angeht, daher ist sicherlich nicht alles optimal.
+Für die Schalter hatte ich kein Bauteil gefunden. Daher die gestrichelte Linie und den entprechenden Namen (Hauptschalter, Zündschalter).
+Verbunden ist bei Überkreuzungen nur das, was einen Punkt hat.
+Die Schieberegister hatten keinen Pin für Vcc, daher ist da ein extra Punkt eingezeichnet und benannt. Das muss an den entsprechenden Pin angeschlossen werden.
+Der Schaltplan zeigt den Aufbau für 16 Kanäle. Will man nur 8 Kanäle umsetzen, so lässt man das rechte Schieberegister und alle daran angeschlossenen Treiber einfach weg. Die Leitung, die auf Pin 9 ankommt, muss dann stattdessen beim linken Schieberegister auf Pin 9 angeschlossen werden.
+Warum?
+Die Schieberegister sind seriell durchgeschleift, indem der serielle Ausgang (Pin 9) des ersten Registers an den Eingang (Pin 14) des nächsten Registers geht. Das LETZTE Register geht dann wieder zurück zum Controller. Will man noch mehr Schieberegister nutzen, so fügt man sie nach diesem Schema einfach zwischen die beiden Register des Schaltplans ein.
+Alle anderen Datenleitungen sind als Bus ausgeführt. An jedem Register kommt das selbe an.
+Dadurch, dass das letzte Register (bei 8 Kanälen ist das auch das Erste) diesen Ausgang an den Controller zurückgibt, kann der Controller zählen, wieviele Kanäle vorhanden sind. Mit diesem Trick funktioniert die selbe Software mit beliebig vielen Registern. Es wäre sogar möglich, ein einzelnes größeres Register zu verwenden, solange die gleichen Eigenschaften vorliegen.
+
+### Aufbau
+Für das Zündmodul gibt es keine vorgefertigte Platine. Es bietet sich an, die Bauteile auf Lochraster zu löten.
+Zu aller erst sollte man sich Gedanken machen, wo und wie man alle Bauteile platziert.
+Generelle Strategie: An einem Ende Controller und Basisbeschaltung zusammen. Dann mittig Schieberegister und am anderen Ende die MosFet mit Widerstanden.
+
+Wenn man Schritt für Schritt vorgehen will, lötet man zunächst nur den Basisaufbau (nicht übersehen, dass die LED vom Zündschalter auf Masse geht, die Leitung läuft durch die ganzen Treiber).
+Temporär muss man jetzt D2 und D3 (über den vorhandenen 1k Widerstand) überbrücken. Dann kann man Software aufspielen und testen. Die LEDs sollten schon korrekt reagieren (Power LED beim Hauptschalter, Zünd LED beim Zündschalter und die Zündleitungs LED bei Scharfschaltung). Anmerkung: Die Zündleitungs LED leuchtet bei eingeschalteter Power LED schwach. Das ist normal, da Prüfspannung auf der Zündleitung anliegt.
+Ebenso sollte die Spannungsanzeige in der App funktionieren (etwa Nennspannung bei eingeschalteter Zündung und ansonsten 2-3V).
+
+Falls an dieser Stelle irgendwas nicht wie beschrieben geht: Fehler suchen.
+
+Anschließend ist es praktisch die MosFet jeweils in Reihen zu setzen, so dass man die Massebeine direkt aufeinander löten kann. Aber Platz lassen, da müssen noch Widerstände hin. Die ebenfalls einlöten, so dass nur noch das Schaltsignal am R100 Widerstand fehlt und der Ausgang zum Anschlussterminal.
+Zuletzt die Schieberegister platzieren und verlöten. Nicht vergessen: Die Brücke zwischen D2 und D3 aufmachen und an den Registern korrekt anschließen.
