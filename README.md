@@ -142,27 +142,27 @@ Allgemein werden alle Aktionen über HTTP GET gesteuert. Für das Feuern eines K
 Die Antwort ist immer ein simpler Text in Form von Properties.
 
 #### Status
-Mit einem HPPT GET und dem Pfad "state" wird der Status abgerufen. Beispiel: GET http://192.168.0.128/state
+Mit einem HPPT GET und dem Pfad "state" wird der Status abgerufen. Beispiel: `GET http://192.168.0.128/state`
 Als Antwort erhält man Spannung und Zündzustand.
 - voltage=12.6
 - a=1
 
 #### Zündbereitschaft EIN
-Mit einem HPPT GET und dem Pfad "arm" wird Zündbereitschaft aktiviert. Beispiel: GET http://192.168.0.128/arm
+Mit einem HPPT GET und dem Pfad "arm" wird Zündbereitschaft aktiviert. Beispiel: `GET http://192.168.0.128/arm`
 Als Antwort erhält man operation=1 einen Misserfolg gibt es hier nicht.
 
 #### Zündbereitschaft AUS
-Mit einem HPPT GET und dem Pfad "disarm" wird Zündbereitschaft aktiviert. Beispiel: GET http://192.168.0.128/disarm
+Mit einem HPPT GET und dem Pfad "disarm" wird Zündbereitschaft aktiviert. Beispiel: `GET http://192.168.0.128/disarm`
 Als Antwort erhält man operation=1 einen Misserfolg gibt es hier nicht.
 
 #### Kanal zünden
-Mit einem HTTP GET und dem Pfad "fire" wird ein Kanel gezündet. Als Parameter "channel" ist die Kanalnummer zu übergeben. Beispiel: GET http://192.168.0.128/fire?channel=6
+Mit einem HTTP GET und dem Pfad "fire" wird ein Kanel gezündet. Als Parameter "channel" ist die Kanalnummer zu übergeben. Beispiel: `GET http://192.168.0.128/fire?channel=6`
 Als Antwort erhält man Bestätigung und den gefeuerten Kanal
 - operation=1
 - channel=6
 
 #### Durchgangsprüfung durchführen
-Mit einem HTTP GET und dem Pfad "check" wird auf allen Kanälen auf Durchgang geprüft. Beispiel: GET http://192.168.0.128/check
+Mit einem HTTP GET und dem Pfad "check" wird auf allen Kanälen auf Durchgang geprüft. Beispiel: `GET http://192.168.0.128/check`
 Die Anlage stellt nun sicher, dass sie NICHT Zündbereit ist und prüft zusätzlich die anliegende Zündspannung. Geht hier etwas schief, so kommt operation=0 zurück, um den Fehler anzuzeigen. Ansonsten kommt operation=1 und für jeden Kanal die Info, ob er Durchgang hat
 - operation=1
 - c1=0
@@ -171,7 +171,7 @@ Die Anlage stellt nun sicher, dass sie NICHT Zündbereit ist und prüft zusätzl
 - etc...
 
 #### Modulkonfiguraton abfragen
-Mit einem HPPT GET und dem Pfad "getConfig" wird die Modulkonfiguration abgefragt. Beispiel: GET http://192.168.0.128/getConfig
+Mit einem HPPT GET und dem Pfad "getConfig" wird die Modulkonfiguration abgefragt. Beispiel: `GET http://192.168.0.128/getConfig`
 Als Antwort erhält man den Modulnamen und die Anzahl Kanäle
 - name=Fiffi
 - channels=16
