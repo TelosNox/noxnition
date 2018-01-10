@@ -105,7 +105,7 @@ Für das Zündmodul gibt es keine vorgefertigte Platine. Es bietet sich an, die 
 Zu aller erst sollte man sich Gedanken machen, wo und wie man alle Bauteile platziert.
 Generelle Strategie: An einem Ende Controller und Basisbeschaltung zusammen. Dann mittig Schieberegister und am anderen Ende die MosFet mit Widerstanden.
 
-Wenn man Schritt für Schritt vorgehen will, lötet man zunächst nur den Basisaufbau (nicht übersehen, dass die LED vom Zündschalter auf Masse geht, die Leitung läuft durch die ganzen Treiber).
+Wenn man Schritt für Schritt vorgehen will, lötet man zunächst nur den Basisaufbau (nicht übersehen, dass die LED vom Zündschalter auf Masse geht, die Leitung läuft durch die ganzen Treiber). Die rote LED ist für den Hauptschalter gedacht, die gelbe für den Zündkreisschalter und die Grüne zeigt Zündbereitschaft an. Wer möchte mann auch die grüne LED als EIN/AUS nutzen und die rote LED als Warnfarbe für Zündbereitschaft. Die Anleitung geht davon aus, dass Rot für EIN/AUS benutzt wird und beschreibt entsprechend.
 Temporär muss man jetzt D2 und D3 (über den vorhandenen 1k Widerstand) überbrücken. Dann kann man Software aufspielen und testen. Die LEDs sollten schon korrekt reagieren (Power LED beim Hauptschalter, Zünd LED beim Zündschalter und die Zündleitungs LED bei Scharfschaltung). Anmerkung: Die Zündleitungs LED leuchtet bei eingeschalteter Power LED schwach. Das ist normal, da Prüfspannung auf der Zündleitung anliegt.
 Ebenso sollte die Spannungsanzeige in der App funktionieren (etwa Nennspannung bei eingeschalteter Zündung und ansonsten 2-3V).
 
@@ -113,3 +113,71 @@ Falls an dieser Stelle irgendwas nicht wie beschrieben geht: Fehler suchen.
 
 Anschließend ist es praktisch die MosFet jeweils in Reihen zu setzen, so dass man die Massebeine direkt aufeinander löten kann. Aber Platz lassen, da müssen noch Widerstände hin. Die ebenfalls einlöten, so dass nur noch das Schaltsignal am R100 Widerstand fehlt und der Ausgang zum Anschlussterminal.
 Zuletzt die Schieberegister platzieren und verlöten. Nicht vergessen: Die Brücke zwischen D2 und D3 aufmachen und an den Registern korrekt anschließen.
+
+## Bedienung des Zündmoduls
+Am Zündmodul gibt es nur 2 Schalter und 3 Leds.
+Der Zündkreisschalter sollte beim Einschalten immer ausgeschalten sein (Sicherheit). Dann den Hauptschalter umlegen.
+Die rote LED leuchtet, um den Betriebszustand EIN anzuzeigen. Die grüne Zündkreis LED leuchtet schwach (das lässt sich nicht verhindern bzw. wäre nur mit zusätzlichem Aufwand lösbar), das ist normal.
+Jetzt ist das Modul Betriebsbereit. Der Zündkreisschalter wird erst dann umgelegt, wenn alle Zünder fertig angeschlossen sind und man sich vergewissert hat, dass die elektrische Scharfschaltung AUS ist (mittels App). Auch die Durchgangsprüfung sollte man sicherheitshalber immer mit ausgeschaltenem Zündkreisschalter machen.
+
+### Konfiguration
+Das Modul versucht sich ca. 30sec lang automatisch mit dem konfigurierten WiFi zu verbinden (initial ist noch nichts konfiguriert). Findet es kein passendes Netz, wird es automatisch selbst zum AccessPoint. Per default gelten folgende Daten:
+- ssid = "noxnition"
+- passwort = "noxnition"
+- ip = 192.168.0.128
+Das kann im ino Script vorm Einspielen der Software geändert werden.
+
+Nun verbindet man sich mit dem Modul über WiFi, so kann man im Browser einfach die IP des Moduls aufrufen. Es erscheint eine kleine Webseite, mit der das Modul konfiguriert werden kann.
+Einzustellen sind:
+- Modulname
+- SSID
+- Passwort
+
+SSID und Passwort beziehen sich hier auf das WiFi, zu dem das Modul sich verbinden soll. Der Modulname MUSS bei Verwendung der App eindeutig sind. Wenn mehrere Module verwendet werden, unterscheidet die App sie anhand ihres Namens.
+
+### Kommunikation
+Ist das Modul konfiguriert und loggt sich in ein WiFi ein, so schaltet es in den Bereitschaftsmodus. Jetzt können über HTTP die Funktionen aufgerufen werden.
+
+Allgemein werden alle Aktionen über HTTP GET gesteuert. Für das Feuern eines Kanals wird der Kanal als Parameter übergeben.
+Die Antwort ist immer ein simpler Text in Form von Properties.
+
+#### Status
+Mit einem HPPT GET und dem Pfad "state" wird der Status abgerufen. Beispiel: GET http://192.168.0.128/state
+Als Antwort erhält man Spannung und Zündzustand.
+- voltage=12.6
+- a=1
+
+#### Zündbereitschaft EIN
+Mit einem HPPT GET und dem Pfad "arm" wird Zündbereitschaft aktiviert. Beispiel: GET http://192.168.0.128/arm
+Als Antwort erhält man operation=1 einen Misserfolg gibt es hier nicht.
+
+#### Zündbereitschaft AUS
+Mit einem HPPT GET und dem Pfad "disarm" wird Zündbereitschaft aktiviert. Beispiel: GET http://192.168.0.128/disarm
+Als Antwort erhält man operation=1 einen Misserfolg gibt es hier nicht.
+
+#### Kanal zünden
+Mit einem HTTP GET und dem Pfad "fire" wird ein Kanel gezündet. Als Parameter "channel" ist die Kanalnummer zu übergeben. Beispiel: GET http://192.168.0.128/fire?channel=6
+Als Antwort erhält man Bestätigung und den gefeuerten Kanal
+- operation=1
+- channel=6
+
+#### Durchgangsprüfung durchführen
+Mit einem HTTP GET und dem Pfad "check" wird auf allen Kanälen auf Durchgang geprüft. Beispiel: GET http://192.168.0.128/check
+Die Anlage stellt nun sicher, dass sie NICHT Zündbereit ist und prüft zusätzlich die anliegende Zündspannung. Geht hier etwas schief, so kommt operation=0 zurück, um den Fehler anzuzeigen. Ansonsten kommt operation=1 und für jeden Kanal die Info, ob er Durchgang hat
+- operation=1
+- c1=0
+- c2=1
+- c3=1
+- etc...
+
+#### Modulkonfiguraton abfragen
+Mit einem HPPT GET und dem Pfad "getConfig" wird die Modulkonfiguration abgefragt. Beispiel: GET http://192.168.0.128/getConfig
+Als Antwort erhält man den Modulnamen und die Anzahl Kanäle
+- name=Fiffi
+- channels=16
+
+#### Modul finden
+Da die Module über DHCP eine IP bekommen und diese dem Sender somit nicht zwingend bekannt ist, können Module per Broadcast gefunden werden. Jedes Modul reagiert auf UDP Broadcast und sendet als Antwort an den Absender ein UDP Paket mit einer Antwort, wie bei den HTTP Requests. Sie enthält Modulname, Kanäle und den Inhalt der Broadcast Nachricht (zur Identifikation des Requests, wenn zyklisch gepollt wird)-
+- name=Fiffi
+- channels=16
+- request=broadcast135213 (in der Regel sendet man irgend einen Zufallswert oder zählt sequenziell hoch)
