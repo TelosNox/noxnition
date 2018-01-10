@@ -14,6 +14,7 @@ Dennoch darf natürlich gerne reingeschaut werden.
 - Manuelle Scharfschaltung
 - Elektrische Scharfschaltung
 - Durchgangsprüfung der Zünder
+- Zündspannung 12V max 7A, Prüfstrom 1,2mA
 - Kommunikation über WiFi (WPA gesichert)
 - Einfache API über HTTP
 #### Android App
