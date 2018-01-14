@@ -9,9 +9,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.noxworks.noxnition.INamedElement;
 import de.noxworks.noxnition.model.IgnitionModule;
 
-public class FireTriggerGroup implements Serializable {
+public class FireTriggerGroup implements Serializable, INamedElement {
 
 	private static final long serialVersionUID = 1L;
 
@@ -26,6 +27,7 @@ public class FireTriggerGroup implements Serializable {
 		this.name = name;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}

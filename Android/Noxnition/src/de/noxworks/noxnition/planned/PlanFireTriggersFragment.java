@@ -1,5 +1,6 @@
 package de.noxworks.noxnition.planned;
 
+import java.util.Collections;
 import java.util.List;
 
 import android.app.Dialog;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnGroupClickListener;
+import de.noxworks.noxnition.NamedElementComparator;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.persistence.FireTriggerGroup;
 import de.noxworks.noxnition.persistence.PlannedFirework;
@@ -50,6 +52,7 @@ public class PlanFireTriggersFragment extends Fragment {
 		ExpandableListView plannedTriggerList = (ExpandableListView) rootView.findViewById(R.id.plannedFireTriggersList);
 		registerForContextMenu(plannedTriggerList);
 		triggerGroups = plannedFirework.getFireTriggerGroups();
+		Collections.sort(triggerGroups, NamedElementComparator.getInstance());
 
 		adapter = new FireTriggerGroupArrayAdapter(context, triggerGroups);
 		plannedTriggerList.setAdapter(adapter);
@@ -98,6 +101,7 @@ public class PlanFireTriggersFragment extends Fragment {
 						}
 						FireTriggerGroup triggerGroup = new FireTriggerGroup(name);
 						triggerGroups.add(triggerGroup);
+						Collections.sort(triggerGroups, NamedElementComparator.getInstance());
 						adapter.notifyDataSetChanged();
 						nameDialog.dismiss();
 					}
@@ -153,6 +157,7 @@ public class PlanFireTriggersFragment extends Fragment {
 					}
 
 					triggerGroup.setName(name);
+					Collections.sort(triggerGroups, NamedElementComparator.getInstance());
 					adapter.notifyDataSetChanged();
 					nameDialog.dismiss();
 				}

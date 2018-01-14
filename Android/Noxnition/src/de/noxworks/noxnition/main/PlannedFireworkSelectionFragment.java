@@ -1,7 +1,6 @@
 package de.noxworks.noxnition.main;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import android.app.Dialog;
@@ -27,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import de.noxworks.noxnition.NamedElementComparator;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.persistence.PlannedFirework;
 import de.noxworks.noxnition.persistence.SettingsManager;
@@ -166,13 +166,7 @@ public class PlannedFireworkSelectionFragment extends Fragment {
 	}
 
 	private void sortPlannedFireworks() {
-		Collections.sort(settingsManager.getPlannedFireworks(), new Comparator<PlannedFirework>() {
-
-			@Override
-			public int compare(PlannedFirework lhs, PlannedFirework rhs) {
-				return lhs.getName().compareTo(rhs.getName());
-			}
-		});
+		Collections.sort(settingsManager.getPlannedFireworks(), NamedElementComparator.getInstance());
 	}
 
 	private void handleFireworkListChanged() {
