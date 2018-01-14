@@ -90,6 +90,8 @@ Die folgenden Bauteile sind nötig, um jeweils 8 Kanäle umzusetzen. Diese kann 
 Will man 16 Kanäle umsetzen, dann braucht man das einfach doppelt, bei 24 Kanäle 3x etc..
 
 ### Schaltplan Erläuterung
+Hier findet ihr den [Schaltplan](Hardware/KiCad/Zündanalage_Neu/Schematic.pdf)
+
 Ich bin kein Profi, was KiCad angeht, daher ist sicherlich nicht alles optimal.
 Für die Schalter hatte ich kein Bauteil gefunden. Daher die gestrichelte Linie und den entprechenden Namen (Hauptschalter, Zündschalter).
 Verbunden ist bei Überkreuzungen nur das, was einen Punkt hat.
