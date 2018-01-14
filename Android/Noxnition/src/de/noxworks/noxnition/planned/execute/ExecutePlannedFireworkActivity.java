@@ -106,6 +106,12 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 			}
 		}
 
+		if (fireActions.isEmpty()) {
+			showMessage("No fire actions");
+			finish();
+			return;
+		}
+
 		Map<IgnitionModule, List<Integer>> requiredChannelsByModule = new HashMap<>();
 		for (FireAction fireAction : fireActions) {
 			List<FireTrigger> fireTriggers = fireAction.getFireTriggerGroup().getFireTriggers();
