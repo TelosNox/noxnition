@@ -1,5 +1,6 @@
 package de.noxworks.noxnition.planned;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Dialog;
@@ -24,6 +25,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
 import de.noxworks.noxnition.persistence.FireAction;
@@ -156,13 +158,24 @@ public class PlanFireActionsFragment extends Fragment {
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
+				List<FireTriggerGroup> unassignedFireTriggerGroups = new ArrayList<>(plannedFirework.getFireTriggerGroups());
+				for (FireAction fireAction : plannedFirework.getFireActions()) {
+					unassignedFireTriggerGroups.remove(fireAction.getFireTriggerGroup());
+				}
+
+				if (unassignedFireTriggerGroups.isEmpty()) {
+					showMessage("All triggers already assigned");
+					return true;
+				}
+
 				FragmentActivity activity = PlanFireActionsFragment.this.getActivity();
 				final Dialog dialog = new Dialog(activity);
 				dialog.setTitle("Add fire trigger");
 				dialog.setContentView(R.layout.add_firetrigger_layout);
 				ListView listView = (ListView) dialog.findViewById(R.id.addFireTriggersList);
+
 				final AddFireTriggerGroupArrayAdapter adapter = new AddFireTriggerGroupArrayAdapter(activity,
-				    plannedFirework.getFireTriggerGroups());
+				    unassignedFireTriggerGroups);
 				listView.setAdapter(adapter);
 				listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -202,5 +215,13 @@ public class PlanFireActionsFragment extends Fragment {
 		default:
 			return super.onContextItemSelected(item);
 		}
+	}
+
+	private void showMessage(String message) {
+		Context context = getActivity();
+		int duration = Toast.LENGTH_SHORT;
+
+		Toast toast = Toast.makeText(context, message, duration);
+		toast.show();
 	}
 }
