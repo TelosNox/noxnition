@@ -2,9 +2,10 @@ package de.noxworks.noxnition.model;
 
 import java.io.Serializable;
 
+import de.noxworks.noxnition.INamedElement;
 import de.noxworks.noxnition.persistence.ModuleConfig;
 
-public class IgnitionModule implements Serializable {
+public class IgnitionModule implements Serializable, INamedElement {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,5 +41,16 @@ public class IgnitionModule implements Serializable {
 
 	public boolean isPlannable() {
 		return getModuleConfig().isConfigured();
+	}
+
+	@Override
+	public String getId() {
+		// TODO change to real ID
+		return getName();
+	}
+
+	@Override
+	public String getName() {
+		return getModuleConfig().getName();
 	}
 }

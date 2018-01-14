@@ -23,11 +23,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -38,7 +36,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+import de.noxworks.noxnition.BaseFragment;
+import de.noxworks.noxnition.IntentHelper;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.adapter.ModuleArrayAdapter;
 import de.noxworks.noxnition.direct.execute.FireActivity;
@@ -48,7 +47,9 @@ import de.noxworks.noxnition.persistence.ModuleConfig;
 import de.noxworks.noxnition.persistence.SettingsManager;
 import de.noxworks.noxnition.tasks.ModuleQueryTask;
 
-public class ModuleSelectionFragment extends Fragment {
+public class ModuleSelectionFragment extends BaseFragment {
+
+	private static String SETTINGS_MANAGER_ID = "settignsManager";
 
 	private static final int SERVERPORT = 2410;
 
@@ -65,14 +66,12 @@ public class ModuleSelectionFragment extends Fragment {
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 	private ScheduledFuture<?> moduleQuerySchedule;
 
-	private final SettingsManager settingsManager;
-
-	public ModuleSelectionFragment(SettingsManager settingsManager) {
-		this.settingsManager = settingsManager;
-	}
+	private SettingsManager settingsManager;
+	private Button fireModulesButton;
 
 	public static ModuleSelectionFragment newInstance(SettingsManager settingsManager) {
-		ModuleSelectionFragment fragment = new ModuleSelectionFragment(settingsManager);
+		ModuleSelectionFragment fragment = new ModuleSelectionFragment();
+		IntentHelper.put(SETTINGS_MANAGER_ID, settingsManager);
 		return fragment;
 	}
 
@@ -80,7 +79,11 @@ public class ModuleSelectionFragment extends Fragment {
 		return ignitionModules;
 	}
 
-	private Button fireModulesButton;
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		settingsManager = (SettingsManager) IntentHelper.get(SETTINGS_MANAGER_ID);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -274,14 +277,6 @@ public class ModuleSelectionFragment extends Fragment {
 				initFireButton();
 			}
 		});
-	}
-
-	private void showMessage(String message) {
-		Context context = getActivity().getApplicationContext();
-		int duration = Toast.LENGTH_SHORT;
-
-		Toast toast = Toast.makeText(context, message, duration);
-		toast.show();
 	}
 
 	void initFireButton() {

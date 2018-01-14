@@ -7,7 +7,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -25,12 +24,14 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnGroupClickListener;
+import de.noxworks.noxnition.BaseFragment;
+import de.noxworks.noxnition.IntentHelper;
 import de.noxworks.noxnition.NamedElementComparator;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.persistence.FireTriggerGroup;
 import de.noxworks.noxnition.persistence.PlannedFirework;
 
-public class PlanFireTriggersFragment extends Fragment {
+public class PlanFireTriggersFragment extends BaseFragment {
 
 	private static final int DELETE_TRIGGER_GROUP = 1;
 	private static final int RENAME_TRIGGER_GROUP = 2;
@@ -40,14 +41,28 @@ public class PlanFireTriggersFragment extends Fragment {
 	private List<FireTriggerGroup> triggerGroups;
 	private FireTriggerGroupArrayAdapter adapter;
 
-	public PlanFireTriggersFragment(PlannedFirework plannedFirework) {
-		this.plannedFirework = plannedFirework;
+	public static PlanFireTriggersFragment newInstance(PlannedFirework plannedFirework) {
+		PlanFireTriggersFragment fragment = new PlanFireTriggersFragment();
+		Bundle bundle = new Bundle(1);
+		bundle.putString(IntentHelper.PLANNED_FIREWORK_ID, plannedFirework.getId());
+		IntentHelper.add(plannedFirework);
+		fragment.setArguments(bundle);
+		return fragment;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		String plannedFireworkId = getArguments().getString(IntentHelper.PLANNED_FIREWORK_ID);
+		plannedFirework = (PlannedFirework) IntentHelper.get(plannedFireworkId);
+
+		setHasOptionsMenu(true);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.plan_firetriggers_layout, container, false);
-		setHasOptionsMenu(true);
 		final Context context = container.getContext();
 		ExpandableListView plannedTriggerList = (ExpandableListView) rootView.findViewById(R.id.plannedFireTriggersList);
 		registerForContextMenu(plannedTriggerList);

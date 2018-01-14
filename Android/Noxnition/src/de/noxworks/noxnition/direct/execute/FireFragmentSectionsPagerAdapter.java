@@ -15,7 +15,7 @@ public class FireFragmentSectionsPagerAdapter extends FragmentStatePagerAdapter 
 
 	@Override
 	public Fragment getItem(int position) {
-		return FireFragment.newInstance(mainActivity, position);
+		return FireFragment.newInstance(mainActivity.getIgnitionModules().get(position));
 	}
 
 	@Override

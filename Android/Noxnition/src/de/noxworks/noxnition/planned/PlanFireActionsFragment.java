@@ -7,7 +7,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -25,7 +24,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+import de.noxworks.noxnition.BaseFragment;
+import de.noxworks.noxnition.IntentHelper;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.adapter.FireActionArrayAdapter;
 import de.noxworks.noxnition.persistence.FireAction;
@@ -33,24 +33,36 @@ import de.noxworks.noxnition.persistence.FireTriggerGroup;
 import de.noxworks.noxnition.persistence.PlannedFirework;
 import de.noxworks.noxnition.planned.execute.ExecutePlannedFireworkActivity;
 
-public class PlanFireActionsFragment extends Fragment {
+public class PlanFireActionsFragment extends BaseFragment {
 
-	public static final String IGNITION_MODULES = "ignition_modules";
-	public static final String PLANNED_FIREWORK = "planned_firework";
 	private static final int DELETE_FIRE_ACTION = 1;
 
 	private PlannedFirework plannedFirework;
 
 	private FireActionArrayAdapter fireActionArrayAdapter;
 
-	public PlanFireActionsFragment(PlannedFirework plannedFirework) {
-		this.plannedFirework = plannedFirework;
+	public static PlanFireActionsFragment newInstance(PlannedFirework plannedFirework) {
+		PlanFireActionsFragment fragment = new PlanFireActionsFragment();
+		Bundle bundle = new Bundle(1);
+		bundle.putString(IntentHelper.PLANNED_FIREWORK_ID, plannedFirework.getId());
+		IntentHelper.add(plannedFirework);
+		fragment.setArguments(bundle);
+		return fragment;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		String plannedFireworkId = getArguments().getString(IntentHelper.PLANNED_FIREWORK_ID);
+		plannedFirework = (PlannedFirework) IntentHelper.get(plannedFireworkId);
+
+		setHasOptionsMenu(true);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.plan_firework_layout, container, false);
-		setHasOptionsMenu(true);
 
 		final Context context = container.getContext();
 
@@ -215,13 +227,5 @@ public class PlanFireActionsFragment extends Fragment {
 		default:
 			return super.onContextItemSelected(item);
 		}
-	}
-
-	private void showMessage(String message) {
-		Context context = getActivity();
-		int duration = Toast.LENGTH_SHORT;
-
-		Toast toast = Toast.makeText(context, message, duration);
-		toast.show();
 	}
 }

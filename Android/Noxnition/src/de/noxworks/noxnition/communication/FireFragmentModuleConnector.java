@@ -11,8 +11,8 @@ public class FireFragmentModuleConnector extends ModuleConnector {
 
 	public FireFragmentModuleConnector(FireFragment mainActivity, String ipAdress, Handler uiHandler) {
 		super(ipAdress, new ArmRequestHandler(mainActivity, uiHandler),
-		    new StateCheckRequestHandler(mainActivity, uiHandler),
+		    new StateCheckRequestHandler<FireFragment>(mainActivity, uiHandler),
 		    new FireChannelRequestHandler<FireFragment>(mainActivity, uiHandler),
-		    new CheckChannelStatesRequestHandler(mainActivity, uiHandler));
+		    new CheckChannelStatesRequestHandler<FireFragment>(mainActivity, uiHandler));
 	}
 }

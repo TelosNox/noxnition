@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,23 +13,46 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ToggleButton;
+import de.noxworks.noxnition.BaseFragment;
+import de.noxworks.noxnition.IntentHelper;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.model.IgnitionModule;
 import de.noxworks.noxnition.persistence.FireTrigger;
 import de.noxworks.noxnition.persistence.FireTriggerGroup;
 import de.noxworks.noxnition.persistence.PlannedFirework;
 
-public class ChannelSelectionFragment extends Fragment {
+public class ChannelSelectionFragment extends BaseFragment {
 
-	private final FireTriggerGroup fireTriggerGroup;
-	private final IgnitionModule ignitionModule;
-	private final PlannedFirework plannedFirework;
+	private FireTriggerGroup fireTriggerGroup;
+	private IgnitionModule ignitionModule;
+	private PlannedFirework plannedFirework;
 
-	public ChannelSelectionFragment(IgnitionModule ignitionModule, FireTriggerGroup fireTriggerGroup,
+	public static ChannelSelectionFragment newInstance(IgnitionModule ignitionModule, FireTriggerGroup fireTriggerGroup,
 	    PlannedFirework plannedFirework) {
-		this.ignitionModule = ignitionModule;
-		this.fireTriggerGroup = fireTriggerGroup;
-		this.plannedFirework = plannedFirework;
+		ChannelSelectionFragment f = new ChannelSelectionFragment();
+		Bundle bundle = new Bundle(3);
+		bundle.putString(IntentHelper.FIRE_TRIGGER_GROUP_ID, fireTriggerGroup.getId());
+		bundle.putString(IntentHelper.PLANNED_FIREWORK_ID, plannedFirework.getId());
+		bundle.putString(IntentHelper.IGNITION_MODULE_ID, ignitionModule.getId());
+		IntentHelper.add(fireTriggerGroup);
+		IntentHelper.add(plannedFirework);
+		IntentHelper.add(ignitionModule);
+		f.setArguments(bundle);
+		return f;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		String ignitionModuleId = getArguments().getString(IntentHelper.IGNITION_MODULE_ID);
+		ignitionModule = (IgnitionModule) IntentHelper.get(ignitionModuleId);
+
+		String fireTriggerGroupId = getArguments().getString(IntentHelper.FIRE_TRIGGER_GROUP_ID);
+		fireTriggerGroup = (FireTriggerGroup) IntentHelper.get(fireTriggerGroupId);
+
+		String plannedFireworkId = getArguments().getString(IntentHelper.PLANNED_FIREWORK_ID);
+		plannedFirework = (PlannedFirework) IntentHelper.get(plannedFireworkId);
 	}
 
 	@Override

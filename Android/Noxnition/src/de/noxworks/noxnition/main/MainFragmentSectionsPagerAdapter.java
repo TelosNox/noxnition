@@ -19,7 +19,7 @@ public class MainFragmentSectionsPagerAdapter extends FragmentStatePagerAdapter 
 		if (position == 0) {
 			return ModuleSelectionFragment.newInstance(settingsManager);
 		}
-		return new PlannedFireworkSelectionFragment(settingsManager);
+		return PlannedFireworkSelectionFragment.newInstance(settingsManager);
 	}
 
 	@Override

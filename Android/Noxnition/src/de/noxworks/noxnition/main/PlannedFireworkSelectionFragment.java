@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -26,23 +25,35 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import de.noxworks.noxnition.BaseFragment;
+import de.noxworks.noxnition.IntentHelper;
 import de.noxworks.noxnition.NamedElementComparator;
 import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.persistence.PlannedFirework;
 import de.noxworks.noxnition.persistence.SettingsManager;
 import de.noxworks.noxnition.planned.PlanFireworkActivity;
 
-public class PlannedFireworkSelectionFragment extends Fragment {
+public class PlannedFireworkSelectionFragment extends BaseFragment {
+
+	private static String SETTINGS_MANAGER_ID = "settignsManager";
 
 	private static final int DELETE_PLANNED_FIREWORK = 1;
 	private static final int RENAME_PLANNED_FIREWORK = 2;
 
-	private final SettingsManager settingsManager;
+	private SettingsManager settingsManager;
 	private ArrayAdapter<PlannedFirework> plannedFireworksAdapter;
 	private Handler updateConversationHandler;
 
-	public PlannedFireworkSelectionFragment(SettingsManager settingsManager) {
-		this.settingsManager = settingsManager;
+	public static PlannedFireworkSelectionFragment newInstance(SettingsManager settingsManager) {
+		PlannedFireworkSelectionFragment fragment = new PlannedFireworkSelectionFragment();
+		IntentHelper.put(SETTINGS_MANAGER_ID, settingsManager);
+		return fragment;
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		settingsManager = (SettingsManager) IntentHelper.get(SETTINGS_MANAGER_ID);
 	}
 
 	@Override

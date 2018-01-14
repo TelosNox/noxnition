@@ -25,7 +25,7 @@ public class ChannelSelectionFragmentSectionsPagerAdapter extends FragmentStateP
 
 	@Override
 	public Fragment getItem(int position) {
-		return new ChannelSelectionFragment(ignitionModules.get(position), fireTriggerGroup, plannedFirework);
+		return ChannelSelectionFragment.newInstance(ignitionModules.get(position), fireTriggerGroup, plannedFirework);
 	}
 
 	@Override

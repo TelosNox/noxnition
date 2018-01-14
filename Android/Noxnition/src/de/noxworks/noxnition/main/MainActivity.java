@@ -17,7 +17,9 @@ public class MainActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setTitle("Noxnition");
-		settingsManager = new SettingsManager(getSharedPreferences(PREFS_NAME, 0));
+		if (settingsManager == null) {
+			settingsManager = new SettingsManager(getSharedPreferences(PREFS_NAME, 0));
+		}
 		mSectionsPagerAdapter = new MainFragmentSectionsPagerAdapter(getSupportFragmentManager(), settingsManager);
 		initStartLayout();
 	}

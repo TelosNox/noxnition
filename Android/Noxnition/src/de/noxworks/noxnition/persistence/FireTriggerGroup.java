@@ -48,6 +48,12 @@ public class FireTriggerGroup implements Serializable, INamedElement {
 		fireTriggers.remove(fireTrigger);
 	}
 
+	@Override
+	public String getId() {
+		// TODO change to real ID
+		return name;
+	}
+
 	public String toJson() throws JSONException {
 		JSONObject json = new JSONObject();
 		json.put(NAME, name);

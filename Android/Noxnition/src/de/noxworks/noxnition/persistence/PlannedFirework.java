@@ -47,6 +47,12 @@ public class PlannedFirework implements Serializable, INamedElement {
 	}
 
 	@Override
+	public String getId() {
+		// TODO change to real ID
+		return name;
+	}
+
+	@Override
 	public String toString() {
 		return getName();
 	}

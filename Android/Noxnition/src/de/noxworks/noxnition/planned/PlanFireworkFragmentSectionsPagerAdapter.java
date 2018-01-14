@@ -17,9 +17,9 @@ public class PlanFireworkFragmentSectionsPagerAdapter extends FragmentStatePager
 	@Override
 	public Fragment getItem(int position) {
 		if (position == 0) {
-			return new PlanFireActionsFragment(plannedFirework);
+			return PlanFireActionsFragment.newInstance(plannedFirework);
 		}
-		return new PlanFireTriggersFragment(plannedFirework);
+		return PlanFireTriggersFragment.newInstance(plannedFirework);
 	}
 
 	@Override
