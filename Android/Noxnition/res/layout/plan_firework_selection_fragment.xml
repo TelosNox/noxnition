@@ -6,23 +6,18 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
-    <EditText
-        android:id="@+id/planFireworkDialog_name"
+    <ListView
+        android:id="@+id/planFireworkSelection_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:singleLine="true"
-        android:inputType="textCapSentences"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
+        android:layout_weight="1" >
+    </ListView>
 
     <Button
-        android:id="@+id/planFireworkDialog_okButton"
+        android:id="@+id/planFireworkSelection_newButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:text="Ok" />
+        android:text="Neu" />
     
 </LinearLayout>

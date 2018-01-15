@@ -21,7 +21,9 @@ public class RequestTask {
 	}
 
 	public void execute(String... params) {
-		requestHandler.preRequest();
+		if (requestHandler != null) {
+			requestHandler.preRequest();
+		}
 
 		int TIMEOUT_VALUE = 500;
 		Properties props = new Properties();
@@ -43,11 +45,15 @@ public class RequestTask {
 			InputStream inputStream = urlConnection.getInputStream();
 			props.load(inputStream);
 		} catch (Exception e) {
-			requestHandler.requestFailed();
+			if (requestHandler != null) {
+				requestHandler.requestFailed();
+			}
 			return;
 		} finally {
 			urlConnection.disconnect();
 		}
-		requestHandler.requestSuccess(props);
+		if (requestHandler != null) {
+			requestHandler.requestSuccess(props);
+		}
 	}
 }

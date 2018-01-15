@@ -3,15 +3,16 @@ package de.noxworks.noxnition.handler;
 import java.util.Properties;
 
 import android.os.Handler;
-import de.noxworks.noxnition.FireFragment;
+import de.noxworks.noxnition.IMessageable;
+import de.noxworks.noxnition.IStateCheckResultHandler;
 import de.noxworks.noxnition.communication.StateCheckResult;
 
-public class StateCheckRequestHandler extends RequestHandler<FireFragment> {
+public class StateCheckRequestHandler<T extends IStateCheckResultHandler & IMessageable> extends RequestHandler<T> {
 
-	private final FireFragment mainActivity;
+	private final T mainActivity;
 	private long startMillis;
 
-	public StateCheckRequestHandler(FireFragment mainActivity, Handler uiHandler) {
+	public StateCheckRequestHandler(T mainActivity, Handler uiHandler) {
 		super(mainActivity, uiHandler);
 		this.mainActivity = mainActivity;
 	}

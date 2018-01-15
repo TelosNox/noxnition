@@ -1,4 +1,4 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.direct.execute;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,7 +15,7 @@ public class FireFragmentSectionsPagerAdapter extends FragmentStatePagerAdapter 
 
 	@Override
 	public Fragment getItem(int position) {
-		return FireFragment.newInstance(mainActivity, position);
+		return FireFragment.newInstance(mainActivity.getIgnitionModules().get(position));
 	}
 
 	@Override

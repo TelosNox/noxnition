@@ -5,7 +5,7 @@ import java.util.Properties;
 import android.os.Handler;
 import de.noxworks.noxnition.IMessageable;
 
-public class ArmRequestHandler extends RequestHandler {
+public class ArmRequestHandler extends RequestHandler<IMessageable> {
 
 	public ArmRequestHandler(IMessageable activity, Handler uiHandler) {
 		super(activity, uiHandler);

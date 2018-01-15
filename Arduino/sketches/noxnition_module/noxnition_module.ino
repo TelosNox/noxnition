@@ -89,7 +89,7 @@ void setup() {
   Serial.println();
 
   boolean clientMode = initWifiClient(ssid, password);
-
+  
   Serial.println(WiFi.localIP());
   
   if (!clientMode) {
@@ -113,6 +113,7 @@ void initModuleServer() {
   server.begin();
   server.on("/state", getStatus);
   server.on("/arm", arm);
+  server.on("/disarm", disarm);
   server.on("/fire", fire);
   server.on("/check", check);
   server.on("/getConfig", getConfig);
@@ -285,13 +286,19 @@ void setRegisterOutput() {
 }
 
 void arm() {
-  armInternal();
+  armInternal(true);
 
   server.send(200, "application/json", "operation=1");
 }
 
-void armInternal() {
-  armed = !armed;
+void disarm() {
+  armInternal(false);
+
+  server.send(200, "application/json", "operation=1");
+}
+
+void armInternal(boolean arm) {
+  armed = arm;
   digitalWrite(pinMain, armed);
 }
 
@@ -303,7 +310,7 @@ void check() {
   
   boolean wasArmed = armed;
   if (armed) {
-    armInternal();
+    armInternal(false);
     delay(20);
   }
   int voltageIn = analogRead(A0);
@@ -401,7 +408,6 @@ void handleFire() {
 void loop() {
   int packetSize = Udp.parsePacket();
 if (packetSize) {
-  Serial.printf("Received %d bytes from %s, port %d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
   int len = Udp.read(incomingPacket, 255);
   if (len > 0) {
     incomingPacket[len] = 0;
@@ -418,7 +424,6 @@ if (packetSize) {
     client.print(temp);
   }
   client.stop();
-  Serial.printf("UDP packet contents: %s\n", incomingPacket);
 }
   processVoltage();
   handleFire();

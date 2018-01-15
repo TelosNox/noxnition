@@ -1,6 +1,9 @@
-package de.noxworks.noxnition.settings;
+package de.noxworks.noxnition.persistence;
 
 import java.io.Serializable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ModuleConfig implements Serializable {
 
@@ -35,5 +38,19 @@ public class ModuleConfig implements Serializable {
 
 	public void setConfigured(boolean configured) {
 		this.configured = configured;
+	}
+
+	public static ModuleConfig fromJson(String jsonString) throws JSONException {
+		JSONObject json = new JSONObject(jsonString);
+		String name = json.getString("name");
+		int channels = json.getInt("channels");
+		return new ModuleConfig(name, channels, true);
+	}
+
+	public String toJson() throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("name", getName());
+		json.put("channels", getChannels());
+		return json.toString();
 	}
 }

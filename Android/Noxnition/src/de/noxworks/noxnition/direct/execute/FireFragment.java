@@ -1,5 +1,6 @@
-package de.noxworks.noxnition;
+package de.noxworks.noxnition.direct.execute;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -11,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -24,16 +24,19 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+import de.noxworks.noxnition.BaseFragment;
+import de.noxworks.noxnition.IFireResultHandler;
+import de.noxworks.noxnition.IStateCheckResultHandler;
+import de.noxworks.noxnition.IntentHelper;
+import de.noxworks.noxnition.R;
 import de.noxworks.noxnition.communication.FireChannelResult;
 import de.noxworks.noxnition.communication.FireFragmentModuleConnector;
 import de.noxworks.noxnition.communication.ModuleConnector;
 import de.noxworks.noxnition.communication.StateCheckResult;
 import de.noxworks.noxnition.model.IgnitionModule;
 
-public class FireFragment extends Fragment implements IMessageable, IFireResultHandler {
-
-	private static final String ARG_SECTION_NUMBER = "section_number";
-	public static final String ARG_IGNITION_MODULE = "ignition_module";
+public class FireFragment extends BaseFragment
+    implements IFireResultHandler, IChannelStatesHandler, IStateCheckResultHandler {
 
 	private Timer timer;
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -42,27 +45,33 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 	private Switch armedSwitch;
 	private TextView connectionState;
 	private Map<Integer, ToggleButton> identifierByChannelButton;
-	private IMessageable activity;
 
 	private ModuleConnector moduleConnector = null;
-	private Handler uiHandler;
+	private Handler uiHandler = new Handler();
+	private IgnitionModule ignitionModule;
 
 	public Map<Integer, ToggleButton> getIdentifierByChannelButton() {
 		return identifierByChannelButton;
 	}
 
-	public FireFragment(FireActivity fireActivity) {
-		this.activity = fireActivity;
-		uiHandler = new Handler();
+	public static FireFragment newInstance(IgnitionModule ignitionModule) {
+		FireFragment fragment = new FireFragment();
+		Bundle args = new Bundle();
+		args.putString(IntentHelper.IGNITION_MODULE_ID, ignitionModule.getId());
+		fragment.setArguments(args);
+		IntentHelper.add(ignitionModule);
+		return fragment;
 	}
 
-	public static FireFragment newInstance(FireActivity fireActivity, int sectionNumber) {
-		FireFragment fragment = new FireFragment(fireActivity);
-		Bundle args = new Bundle();
-		args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-		args.putSerializable(ARG_IGNITION_MODULE, fireActivity.getIgnitionModules().get(sectionNumber));
-		fragment.setArguments(args);
-		return fragment;
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		String ignitionModuleId = getArguments().getString(IntentHelper.IGNITION_MODULE_ID);
+		ignitionModule = (IgnitionModule) IntentHelper.get(ignitionModuleId);
+		moduleConnector = new FireFragmentModuleConnector(this, ignitionModule.getIpAddress(), uiHandler);
+
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -72,17 +81,17 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 		connectionState = (TextView) rootView.findViewById(R.id.configMain);
 		setConnectionState(false, 0);
 
-		IgnitionModule ignitionModule = (IgnitionModule) getArguments().getSerializable(ARG_IGNITION_MODULE);
-
-		moduleConnector = new FireFragmentModuleConnector(this, ignitionModule.getIpAddress(), uiHandler);
-
 		armedSwitch = (Switch) rootView.findViewById(R.id.scharf);
 		armedSwitch.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				armedSwitch.setChecked(!armedSwitch.isChecked());
-				moduleConnector.sendArmRequest();
+				if (armedSwitch.isChecked()) {
+					moduleConnector.sendDisArmRequest();
+				} else {
+					moduleConnector.sendArmRequest();
+				}
 			}
 		});
 
@@ -122,12 +131,6 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 		return rootView;
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-	}
-
 	private View.OnClickListener createChannelListener(final Integer channel) {
 		final ToggleButton button = identifierByChannelButton.get(channel);
 		return new View.OnClickListener() {
@@ -163,8 +166,16 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 		connectionState.setTextColor(color);
 	}
 
-	public void setChannelState(final ToggleButton channel, final boolean state) {
-		channel.setChecked(state);
+	@Override
+	public void handleChannelState(final int channel, final boolean state) {
+		final ToggleButton toggleButton = identifierByChannelButton.get(channel);
+		uiHandler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				toggleButton.setChecked(state);
+			}
+		});
 	}
 
 	private void startTimer() {
@@ -207,9 +218,8 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				for (Map.Entry<Integer, ToggleButton> entry : identifierByChannelButton.entrySet()) {
-					ToggleButton channel = entry.getValue();
-					setChannelState(channel, false);
+				for (ToggleButton toggleButton : identifierByChannelButton.values()) {
+					toggleButton.setChecked(false);
 				}
 				moduleConnector.checkChannelStates();
 				return true;
@@ -218,10 +228,6 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 	}
 
 	@Override
-	public void showMessage(String message) {
-		activity.showMessage(message);
-	}
-
 	public void handleStateCheckResult(final StateCheckResult result) {
 		uiHandler.post(new Runnable() {
 
@@ -260,5 +266,10 @@ public class FireFragment extends Fragment implements IMessageable, IFireResultH
 				}
 			}
 		});
+	}
+
+	@Override
+	public Collection<Integer> getChannels() {
+		return identifierByChannelButton.keySet();
 	}
 }

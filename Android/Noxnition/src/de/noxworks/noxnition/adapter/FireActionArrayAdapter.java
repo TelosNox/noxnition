@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import de.noxworks.noxnition.R;
-import de.noxworks.noxnition.model.FireAction;
+import de.noxworks.noxnition.persistence.FireAction;
 
 public class FireActionArrayAdapter extends BaseAdapter {
 
@@ -45,15 +45,9 @@ public class FireActionArrayAdapter extends BaseAdapter {
 		}
 		FireAction fireAction = fireActions.get(position);
 
-		TextView moduleText = (TextView) vi.findViewById(R.id.fireactionRow_module);
-		moduleText.setText(fireAction.getModule().getModuleConfig().getName());
-		TextView channelText = (TextView) vi.findViewById(R.id.fireactionRow_channel);
+		TextView triggerText = (TextView) vi.findViewById(R.id.fireactionTrigger_name);
+		triggerText.setText(fireAction.getFireTriggerGroup().getName());
 		TextView timeText = (TextView) vi.findViewById(R.id.fireactionRow_time);
-		TextView nameText = (TextView) vi.findViewById(R.id.fireactionRow_name);
-		nameText.setText(fireAction.getName());
-
-		channelText.setText("Channel " + fireAction.getChannel());
-		channelText.setTextColor(Color.GRAY);
 		String delayText = fireAction.getDelay() + " sec";
 		timeText.setText(delayText);
 		timeText.setTextColor(Color.GRAY);
