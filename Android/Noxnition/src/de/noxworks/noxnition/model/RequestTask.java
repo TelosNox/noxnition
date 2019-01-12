@@ -1,13 +1,15 @@
 package de.noxworks.noxnition.model;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Properties;
 
+import android.os.AsyncTask;
 import de.noxworks.noxnition.handler.IRequestHandler;
 
-public class RequestTask {
+public class RequestTask extends AsyncTask<String, Integer, Properties> {
 
 	private final String ipAddress;
 
@@ -20,12 +22,9 @@ public class RequestTask {
 		this.requestHandler = requestHandler;
 	}
 
-	public void execute(String... params) {
-		if (requestHandler != null) {
-			requestHandler.preRequest();
-		}
-
-		int TIMEOUT_VALUE = 500;
+	@Override
+	protected Properties doInBackground(String... params) {
+		int TIMEOUT_VALUE = 1000;
 		Properties props = new Properties();
 		HttpURLConnection urlConnection = null;
 		try {
@@ -39,21 +38,31 @@ public class RequestTask {
 				urlString += paramBuilder.toString();
 			}
 			URL url = new URL(urlString);
+			if (requestHandler != null) {
+				requestHandler.preRequest();
+			}
+			long send = System.currentTimeMillis();
 			urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setRequestMethod("GET");
 			urlConnection.setConnectTimeout(TIMEOUT_VALUE);
 			urlConnection.setReadTimeout(TIMEOUT_VALUE);
-			InputStream inputStream = urlConnection.getInputStream();
+			InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
 			props.load(inputStream);
+			inputStream.close();
+			long duration = System.currentTimeMillis() - send;
+			System.out.println(duration + "ms - " + urlString);
 		} catch (Exception e) {
+			e.printStackTrace();
 			if (requestHandler != null) {
 				requestHandler.requestFailed();
 			}
-			return;
+			return null;
 		} finally {
 			urlConnection.disconnect();
 		}
-		if (requestHandler != null) {
+		if (requestHandler != null && props != null) {
 			requestHandler.requestSuccess(props);
 		}
+		return props;
 	}
 }

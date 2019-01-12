@@ -3,6 +3,7 @@ package de.noxworks.noxnition.main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -261,7 +262,9 @@ public class ModuleSelectionFragment extends BaseFragment {
 			NetworkInterface ni = niEnum.nextElement();
 			if (!ni.isLoopback() && ni.getDisplayName().contains("wlan0")) {
 				for (InterfaceAddress interfaceAddress : ni.getInterfaceAddresses()) {
-					return interfaceAddress.getBroadcast();
+					if (interfaceAddress.getAddress() instanceof Inet4Address) {
+						return interfaceAddress.getBroadcast();
+					}
 				}
 			}
 		}

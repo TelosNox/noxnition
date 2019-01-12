@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.Vibrator;
 import android.view.KeyEvent;
 import android.view.View;
@@ -47,8 +46,6 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 
 	private FireActionArrayAdapter fireActionArrayAdapter;
 
-	private Handler handler;
-
 	private Map<IgnitionModule, ModuleConnector> connectorsByModule = new HashMap<>();
 	private Button fireButton;
 	private FireAction currentFireAction;
@@ -70,8 +67,6 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 		ignitionModules = settingsManager.getIgnitionModules();
 
 		setTitle("Feuerwerk zünden");
-
-		handler = new Handler();
 
 		Intent intent = getIntent();
 		if (intent != null) {
@@ -100,8 +95,8 @@ public class ExecutePlannedFireworkActivity extends BaseActivity implements IFir
 				StateCheckResultHandler moduleStateHandler = new StateCheckResultHandler();
 				moduleStatesByModule.put(ignitionModule, moduleStateHandler);
 				ModuleConnector moduleConnector = new ModuleConnector(ipAddress, null,
-				    new StateCheckRequestHandler<>(moduleStateHandler, handler), new FireChannelRequestHandler<>(this, null),
-				    new CheckChannelStatesRequestHandler<>(channelStatesHandler, handler));
+				    new StateCheckRequestHandler<>(moduleStateHandler), new FireChannelRequestHandler<>(this),
+				    new CheckChannelStatesRequestHandler<>(channelStatesHandler));
 				connectorsByModule.put(ignitionModule, moduleConnector);
 			}
 		}

@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -47,7 +46,6 @@ public class FireFragment extends BaseFragment
 	private Map<Integer, ToggleButton> identifierByChannelButton;
 
 	private ModuleConnector moduleConnector = null;
-	private Handler uiHandler = new Handler();
 	private IgnitionModule ignitionModule;
 
 	public Map<Integer, ToggleButton> getIdentifierByChannelButton() {
@@ -69,7 +67,7 @@ public class FireFragment extends BaseFragment
 
 		String ignitionModuleId = getArguments().getString(IntentHelper.IGNITION_MODULE_ID);
 		ignitionModule = (IgnitionModule) IntentHelper.get(ignitionModuleId);
-		moduleConnector = new FireFragmentModuleConnector(this, ignitionModule.getIpAddress(), uiHandler);
+		moduleConnector = new FireFragmentModuleConnector(this, ignitionModule.getIpAddress());
 
 		setHasOptionsMenu(true);
 	}

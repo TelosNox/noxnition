@@ -2,6 +2,7 @@ package de.noxworks.noxnition;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -12,6 +13,8 @@ public class BaseActivity extends FragmentActivity implements IMessageable {
 	protected static final String PREFS_NAME = "prefs_name";
 
 	protected static SettingsManager settingsManager;
+
+	protected Handler handler = new Handler();
 
 	@Override
 	protected void onCreate(Bundle arg0) {
@@ -29,8 +32,14 @@ public class BaseActivity extends FragmentActivity implements IMessageable {
 	public void showMessage(String message) {
 		Context context = getApplicationContext();
 		int duration = Toast.LENGTH_SHORT;
+		final Toast toast = Toast.makeText(context, message, duration);
 
-		Toast toast = Toast.makeText(context, message, duration);
-		toast.show();
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				toast.show();
+			}
+		});
 	}
 }

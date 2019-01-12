@@ -3,7 +3,6 @@ package de.noxworks.noxnition.handler;
 import java.util.Collection;
 import java.util.Properties;
 
-import android.os.Handler;
 import de.noxworks.noxnition.IMessageable;
 import de.noxworks.noxnition.direct.execute.IChannelStatesHandler;
 
@@ -12,32 +11,20 @@ public class CheckChannelStatesRequestHandler<T extends IChannelStatesHandler & 
 
 	private static String OPERATION = "operation";
 
-	public CheckChannelStatesRequestHandler(T mainActivity, Handler uiHandler) {
-		super(mainActivity, uiHandler);
+	public CheckChannelStatesRequestHandler(T mainActivity) {
+		super(mainActivity);
 	}
 
 	@Override
 	public void requestFailed() {
-		uiHandler.post(new Runnable() {
-
-			@Override
-			public void run() {
-				messageable.showMessage("Check fehlgeschlagen");
-			}
-		});
+		messageable.showMessage("Check fehlgeschlagen");
 	}
 
 	@Override
 	public void requestSuccess(final Properties properties) {
 		boolean success = properties.get(OPERATION).toString().equals("1");
 		if (!success) {
-			uiHandler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					messageable.showMessage("Check fehlgeschlagen");
-				}
-			});
+			messageable.showMessage("Check fehlgeschlagen");
 			return;
 		}
 
