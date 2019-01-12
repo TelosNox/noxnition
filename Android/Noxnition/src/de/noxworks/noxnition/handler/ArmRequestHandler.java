@@ -2,13 +2,12 @@ package de.noxworks.noxnition.handler;
 
 import java.util.Properties;
 
-import android.os.Handler;
 import de.noxworks.noxnition.IMessageable;
 
 public class ArmRequestHandler extends RequestHandler<IMessageable> {
 
-	public ArmRequestHandler(IMessageable activity, Handler uiHandler) {
-		super(activity, uiHandler);
+	public ArmRequestHandler(IMessageable activity) {
+		super(activity);
 	}
 
 	@Override

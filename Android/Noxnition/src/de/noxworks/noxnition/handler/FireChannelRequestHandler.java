@@ -2,7 +2,6 @@ package de.noxworks.noxnition.handler;
 
 import java.util.Properties;
 
-import android.os.Handler;
 import de.noxworks.noxnition.IFireResultHandler;
 import de.noxworks.noxnition.IMessageable;
 import de.noxworks.noxnition.communication.FireChannelResult;
@@ -11,8 +10,8 @@ public class FireChannelRequestHandler<T extends IFireResultHandler & IMessageab
 
 	private final T mainActivity;
 
-	public FireChannelRequestHandler(T mainActivity, Handler uiHandler) {
-		super(mainActivity, uiHandler);
+	public FireChannelRequestHandler(T mainActivity) {
+		super(mainActivity);
 		this.mainActivity = mainActivity;
 	}
 

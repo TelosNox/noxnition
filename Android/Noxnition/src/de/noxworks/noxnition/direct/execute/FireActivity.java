@@ -7,6 +7,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.WindowManager;
@@ -24,6 +25,8 @@ public class FireActivity extends FragmentActivity implements IMessageable {
 	private ViewPager mViewPager;
 
 	private List<IgnitionModule> ignitionModules = new ArrayList<>();
+
+	private Handler uiHandler = new Handler();
 
 	public List<IgnitionModule> getIgnitionModules() {
 		return ignitionModules;
@@ -61,7 +64,14 @@ public class FireActivity extends FragmentActivity implements IMessageable {
 		Context context = getApplicationContext();
 		int duration = Toast.LENGTH_SHORT;
 
-		Toast toast = Toast.makeText(context, message, duration);
-		toast.show();
+		final Toast toast = Toast.makeText(context, message, duration);
+
+		uiHandler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				toast.show();
+			}
+		});
 	}
 }

@@ -407,24 +407,24 @@ void handleFire() {
  
 void loop() {
   int packetSize = Udp.parsePacket();
-if (packetSize) {
-  int len = Udp.read(incomingPacket, 255);
-  if (len > 0) {
-    incomingPacket[len] = 0;
+  if (packetSize) {
+    int len = Udp.read(incomingPacket, 255);
+    if (len > 0) {
+      incomingPacket[len] = 0;
+    }
+    Serial.println("answer broadcast");
+    WiFiClient client;
+    if (client.connect(Udp.remoteIP().toString().c_str(), 2410)) {
+      String temp = "name=";
+      temp += moduleName;
+      temp += "\nchannels=";
+      temp += channels;
+      temp += "\nrequest=";
+      temp += incomingPacket;
+      client.print(temp);
+    }
+    client.stop();
   }
-
-  WiFiClient client;
-  if (client.connect(Udp.remoteIP().toString().c_str(), 2410)) {
-    String temp = "name=";
-    temp += moduleName;
-    temp += "\nchannels=";
-    temp += channels;
-    temp += "\nrequest=";
-    temp += incomingPacket;
-    client.print(temp);
-  }
-  client.stop();
-}
   processVoltage();
   handleFire();
   server.handleClient();

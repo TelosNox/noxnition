@@ -25,33 +25,22 @@ public class ModuleConnector {
 	}
 
 	public void sendArmRequest() {
-		execute(new RequestTask(ipAdress, "arm", armRequestHandler));
+		new RequestTask(ipAdress, "arm", armRequestHandler).execute();
 	}
 
 	public void sendDisArmRequest() {
-		execute(new RequestTask(ipAdress, "disarm", armRequestHandler));
+		new RequestTask(ipAdress, "disarm", armRequestHandler).execute();
 	}
 
 	public void sendStateCheckRequest() {
-		execute(new RequestTask(ipAdress, "state", stateCheckRequestHandler));
+		new RequestTask(ipAdress, "state", stateCheckRequestHandler).execute();
 	}
 
 	public void fireChannel(int channelNumber) {
-		execute(new RequestTask(ipAdress, "fire", fireChannelRequestHandler), "channel=" + channelNumber);
+		new RequestTask(ipAdress, "fire", fireChannelRequestHandler).execute("channel=" + channelNumber);
 	}
 
 	public void checkChannelStates() {
-		execute(new RequestTask(ipAdress, "check", checkChannelStatesRequestHandler));
-	}
-
-	private void execute(final RequestTask task, final String... params) {
-		Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-				task.execute(params);
-			}
-		};
-		new Thread(runnable).start();
+		new RequestTask(ipAdress, "check", checkChannelStatesRequestHandler).execute();
 	}
 }
